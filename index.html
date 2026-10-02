@@ -1,0 +1,842 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>سامانه ارزشیابی طلاب | مدرسه علمیه امام صادق (ع)</title>
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --primary: #1e3a8a;
+      --primary-light: #3b82f6;
+      --primary-soft: #eff6ff;
+      --success: #059669;
+      --success-soft: #ecfdf5;
+      --danger: #dc2626;
+      --danger-soft: #fef2f2;
+      --warning: #d97706;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --radius: 12px;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Vazirmatn', Tahoma, sans-serif; }
+    body { background-color: var(--bg); color: var(--text-main); padding: 25px 12px; min-height: 100vh; display: flex; justify-content: center; }
+    .app-container { width: 100%; max-width: 1050px; display: flex; flex-direction: column; gap: 18px; }
+
+    /* هدر */
+    .app-header {
+      background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+      color: white; padding: 20px 24px; border-radius: var(--radius);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .header-titles h1 { font-size: 19px; font-weight: 800; margin-bottom: 4px; }
+    .header-titles p { font-size: 12.5px; opacity: 0.85; }
+
+    /* تب‌های ناوبری */
+    .tabs-nav {
+      display: flex; gap: 8px; background: #e2e8f0; padding: 5px; border-radius: 10px;
+    }
+    .tab-btn {
+      flex: 1; padding: 10px 16px; border: none; background: transparent; font-weight: 700;
+      font-size: 13.5px; border-radius: 8px; cursor: pointer; color: var(--text-muted);
+      display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s;
+    }
+    .tab-btn.active { background: white; color: var(--primary); box-shadow: var(--shadow); }
+
+    .card {
+      background: var(--card-bg); border-radius: var(--radius); padding: 20px;
+      border: 1px solid var(--border); box-shadow: var(--shadow);
+    }
+
+    .top-bar { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+    .input-group {
+      display: flex; align-items: center; background: #f1f5f9; border: 1px solid var(--border);
+      border-radius: 8px; padding: 0 12px;
+    }
+    .input-group i { color: var(--text-muted); margin-left: 8px; }
+    .input-group input { border: none; background: transparent; padding: 9px 0; outline: none; width: 100%; font-size: 13.5px; }
+
+    .filter-section { display: grid; grid-template-columns: 2fr 1fr auto; gap: 10px; margin-bottom: 14px; }
+    select.custom-select {
+      background: #f1f5f9; border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px;
+      font-size: 13px; outline: none; cursor: pointer;
+    }
+
+    .selection-controls {
+      display: flex; justify-content: space-between; align-items: center; padding: 8px 0;
+      font-size: 13px; color: var(--text-muted); border-bottom: 1px solid var(--border); margin-bottom: 10px;
+    }
+    .people-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 10px; max-height: 290px; overflow-y: auto; padding-left: 4px;
+    }
+    .student-card {
+      display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #f8fafc;
+      border: 1px solid var(--border); border-radius: 8px; cursor: pointer; user-select: none;
+    }
+    .student-card.selected { background: var(--primary-soft); border-color: #93c5fd; }
+    .student-name { font-weight: 700; font-size: 13px; }
+    .student-meta { font-size: 11px; color: var(--text-muted); display: flex; gap: 6px; }
+
+    .badge { font-size: 11px; padding: 2px 8px; border-radius: 20px; font-weight: 600; }
+    .badge-grade { background: #e0e7ff; color: #3730a3; }
+    .badge-count { background: var(--primary); color: white; }
+
+    .form-section { display: grid; grid-template-columns: 180px 1fr; gap: 14px; margin-top: 15px; }
+    .quick-scores { display: flex; gap: 5px; margin-top: 6px; }
+    .quick-score-btn {
+      flex: 1; padding: 4px 0; font-size: 12px; background: #f1f5f9; border: 1px solid var(--border);
+      border-radius: 6px; cursor: pointer; font-weight: bold;
+    }
+    .quick-score-btn.pos:hover { background: var(--success-soft); color: var(--success); }
+    .quick-score-btn.neg:hover { background: var(--danger-soft); color: var(--danger); }
+
+    textarea {
+      width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 10px;
+      font-size: 13px; outline: none; background: #f8fafc;
+    }
+
+    .action-buttons { display: flex; gap: 12px; margin-top: 16px; }
+    .btn {
+      flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 11px; border-radius: 8px; font-weight: 700; font-size: 13.5px; cursor: pointer; border: none;
+    }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-pdf { background: var(--success); color: white; }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .toast {
+      padding: 10px 14px; border-radius: 8px; font-size: 13px; display: none;
+      align-items: center; gap: 8px; margin-top: 12px;
+    }
+    .toast.success { background: var(--success-soft); color: var(--success); border: 1px solid #a7f3d0; }
+    .toast.error { background: var(--danger-soft); color: var(--danger); border: 1px solid #fecaca; }
+
+    /* جدول نمایش سوابق */
+    .table-container { overflow-x: auto; margin-top: 15px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { background: #f1f5f9; color: var(--text-main); padding: 10px; text-align: right; border-bottom: 2px solid var(--border); }
+    td { padding: 10px; border-bottom: 1px solid var(--border); }
+    tr:hover { background: #f8fafc; }
+    .score-tag { font-weight: bold; padding: 3px 8px; border-radius: 6px; font-size: 12px; }
+    .score-pos { background: var(--success-soft); color: var(--success); }
+    .score-neg { background: var(--danger-soft); color: var(--danger); }
+
+    .summary-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 15px; }
+    .sum-card { background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 12px; text-align: center; }
+    .sum-card h5 { font-size: 11.5px; color: var(--text-muted); margin-bottom: 4px; }
+    .sum-card .val { font-size: 18px; font-weight: 800; }
+
+    .pdf-results { margin-top: 15px; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
+    .pdf-card { background: white; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px; display: flex; justify-content: space-between; align-items: center; text-decoration: none; color: inherit; }
+
+    /* استایل‌های اختصاصی جستجوی زنده پرونده */
+    .search-select-wrapper {
+      position: relative;
+      flex: 1;
+      min-width: 260px;
+    }
+    .search-results-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      max-height: 240px;
+      overflow-y: auto;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-top: 4px;
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+      z-index: 100;
+      display: none;
+    }
+    .search-result-item {
+      padding: 10px 12px;
+      cursor: pointer;
+      border-bottom: 1px solid #f1f5f9;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background 0.15s;
+    }
+    .search-result-item:last-child { border-bottom: none; }
+    .search-result-item:hover {
+      background: var(--primary-soft);
+    }
+    .selected-person-badge {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      padding: 8px 12px;
+      margin-bottom: 12px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+
+  <header class="app-header">
+    <div class="header-titles">
+      <h1>سامانه ارزشیابی و صدور احکام طلاب</h1>
+      <p>مدرسه علمیه حضرت امام صادق (ع) اردکان</p>
+    </div>
+    <i class="fa-solid fa-graduation-cap" style="font-size: 32px; opacity: 0.3;"></i>
+  </header>
+
+  <!-- تب‌های ناوبری -->
+  <div class="tabs-nav">
+    <button class="tab-btn active" id="tabBtnRegister" onclick="switchTab('register')">
+      <i class="fa-solid fa-pen-to-square"></i> ثبت امتیاز و صدور احکام
+    </button>
+    <button class="tab-btn" id="tabBtnHistory" onclick="switchTab('history')">
+      <i class="fa-solid fa-clock-rotate-left"></i> سوابق و نمرات کلی
+    </button>
+    <button class="tab-btn" id="tabBtnProfile" onclick="switchTab('profile')">
+      <i class="fa-solid fa-id-card"></i> پرونده اختصاصی طلبه
+    </button>
+  </div>
+
+  <!-- نوار رمز -->
+  <div class="card" style="padding: 10px 18px;">
+    <div class="top-bar">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span style="font-size:12.5px; font-weight:bold;"><i class="fa-solid fa-key" style="color:var(--warning);"></i> رمز پرسنلی:</span>
+        <div class="input-group" style="width:160px;">
+          <input type="password" id="apiToken" value="123456" />
+        </div>
+      </div>
+      <span style="font-size:11.5px; color:var(--text-muted);">نسخه جامع توسعه‌یافته</span>
+    </div>
+  </div>
+
+  <!-- صفحه ۱: ثبت امتیاز -->
+  <main class="card" id="sectionRegister">
+    <div class="filter-section">
+      <div class="input-group">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="searchBox" placeholder="جستجوی نام طلبه یا شماره پرونده..." oninput="filterPeople()" />
+      </div>
+
+      <select id="gradeFilter" class="custom-select" onchange="filterPeople()">
+        <option value="all">تمام پایه‌ها</option>
+        <option value="پایه ۱">پایه ۱</option>
+        <option value="پایه ۲">پایه ۲</option>
+        <option value="پایه ۳">پایه ۳</option>
+        <option value="پایه ۴">پایه ۴</option>
+        <option value="پایه ۵">پایه ۵</option>
+        <option value="پایه ۶">پایه ۶</option>
+        <option value="پایه ۷">پایه ۷</option>
+      </select>
+
+      <button onclick="toggleSelectAll()" class="btn" style="background:#f1f5f9; color:var(--text-main); border:1px solid var(--border); padding: 8px 12px; font-size: 12px;">
+        <i class="fa-solid fa-check-double"></i> انتخاب همه
+      </button>
+    </div>
+
+    <div class="selection-controls">
+      <div>نمایش: <strong id="visibleCount">۰</strong> طلبه</div>
+      <div>انتخاب‌شده: <span class="badge badge-count" id="selectedBadge">۰</span> نفر</div>
+    </div>
+
+    <div class="people-grid" id="peopleContainer">
+      <div style="grid-column: 1/-1; text-align: center; padding: 30px; color: var(--text-muted);">
+        <i class="fa-solid fa-spinner fa-spin"></i> در حال دریافت لیست طلاب...
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div>
+        <label style="font-size: 12.5px; font-weight: 700; display: block; margin-bottom: 4px;">امتیاز:</label>
+        <div class="input-group">
+          <input type="number" id="score" placeholder="مثلاً: 2 یا -2" style="font-weight:bold; font-size:15px; text-align:center;" />
+        </div>
+        <div class="quick-scores">
+          <button class="quick-score-btn pos" onclick="setScore(1)">+۱</button>
+          <button class="quick-score-btn pos" onclick="setScore(2)">+۲</button>
+          <button class="quick-score-btn neg" onclick="setScore(-1)">-۱</button>
+          <button class="quick-score-btn neg" onclick="setScore(-2)">-۲</button>
+        </div>
+      </div>
+
+      <div>
+        <label style="font-size: 12.5px; font-weight: 700; display: block; margin-bottom: 4px;">علت و متن حکم:</label>
+        <textarea id="description" rows="2" placeholder="توضیحات تشویق یا تذکر انضباطی..."></textarea>
+      </div>
+    </div>
+
+    <div id="statusToast" class="toast"></div>
+
+    <div class="action-buttons">
+      <button class="btn btn-primary" id="btnSave" onclick="saveActivity()">
+        <i class="fa-solid fa-floppy-disk"></i> ثبت سریع در سوابق
+      </button>
+
+      <button class="btn btn-pdf" id="btnPdf" onclick="generateSeparatePdfs()">
+        <i class="fa-solid fa-file-pdf"></i> صدور احکام PDF
+      </button>
+    </div>
+
+    <div id="pdfResultsArea" style="display:none; margin-top: 20px; border-top: 1px dashed var(--border); padding-top: 12px;">
+      <h4 style="font-size: 13.5px; margin-bottom: 10px;"><i class="fa-solid fa-circle-check" style="color:var(--success);"></i> فایل‌های PDF صادر شده:</h4>
+      <div class="pdf-results" id="pdfCardsContainer"></div>
+    </div>
+  </main>
+
+  <!-- صفحه ۲: سوابق و نمرات کلی -->
+  <main class="card" id="sectionHistory" style="display:none;">
+    <div class="summary-cards">
+      <div class="sum-card">
+        <h5>تعداد کل موارد ثبت‌شده</h5>
+        <div class="val" id="totalLogs">۰</div>
+      </div>
+      <div class="sum-card">
+        <h5>مجموع امتیازات مثبت</h5>
+        <div class="val" style="color:var(--success);" id="totalPos">۰</div>
+      </div>
+      <div class="sum-card">
+        <h5>مجموع کسر امتیازات</h5>
+        <div class="val" style="color:var(--danger);" id="totalNeg">۰</div>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:10px; margin-bottom:12px;">
+      <div class="input-group" style="flex:1;">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="historySearch" placeholder="جستجو در سوابق (نام، پایه یا توضیح)..." oninput="filterHistory()" />
+      </div>
+      <button onclick="loadActivities()" class="btn" style="background:#f1f5f9; color:var(--text-main); border:1px solid var(--border); flex:none; padding:8px 14px; font-size:12.5px;">
+        <i class="fa-solid fa-rotate"></i> بروزرسانی
+      </button>
+    </div>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>تاریخ و ساعت</th>
+            <th>نام طلبه</th>
+            <th>پایه</th>
+            <th>امتیاز</th>
+            <th>شرح و علت</th>
+            <th>عملیات</th>
+          </tr>
+        </thead>
+        <tbody id="historyTableBody">
+          <tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding:30px;">در حال بارگذاری سوابق...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- صفحه ۳: پرونده اختصاصی طلبه -->
+  <main class="card" id="sectionProfile" style="display:none;">
+    
+    <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:15px; background:#f8fafc; padding:12px; border-radius:8px; border:1px solid var(--border);">
+      
+      <!-- نوار جستجو و انتخاب طلبه -->
+      <div class="search-select-wrapper">
+        <div class="input-group" style="background: white;">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="profileSearchInput" placeholder="جستجوی طلبه با نام، شماره پرونده یا پایه..." oninput="onProfileSearchInput()" onfocus="onProfileSearchFocus()" autocomplete="off" />
+          <i class="fa-solid fa-xmark" id="clearProfileSearchBtn" style="cursor:pointer; display:none;" onclick="clearProfileSelection()"></i>
+        </div>
+
+        <div id="profileDropdown" class="search-results-dropdown"></div>
+      </div>
+
+      <button onclick="generatePersonProfilePdf()" class="btn btn-pdf" style="flex:none; padding:8px 14px; font-size:12.5px;">
+        <i class="fa-solid fa-file-pdf"></i> PDF کارنامه فرد
+      </button>
+
+      <button onclick="generateOverallPdf()" class="btn btn-primary" style="flex:none; padding:8px 14px; font-size:12.5px;">
+        <i class="fa-solid fa-print"></i> PDF گزارش جامع همه طلاب
+      </button>
+    </div>
+
+    <!-- مشخصات طلبه انتخاب شده -->
+    <div id="selectedPersonInfo" class="selected-person-badge" style="display:none;">
+      <div>
+        <i class="fa-solid fa-user-graduate" style="color:var(--primary); margin-left:6px;"></i>
+        طلبه انتخاب‌شده: <strong id="p_dispName" style="color:var(--primary); font-size:13.5px;">-</strong>
+        <span style="margin:0 6px; color:var(--text-muted);">|</span>
+        پایه: <span id="p_dispGrade" class="badge badge-grade">-</span>
+        <span style="margin:0 6px; color:var(--text-muted);">|</span>
+        شماره پرونده: <strong id="p_dispFileNo">-</strong>
+      </div>
+      <button onclick="clearProfileSelection()" style="background:transparent; border:none; color:var(--danger); cursor:pointer; font-size:12px; font-weight:bold;">
+        <i class="fa-solid fa-arrow-rotate-right"></i> تغییر طلبه
+      </button>
+    </div>
+
+    <div class="summary-cards">
+      <div class="sum-card">
+        <h5>تعداد سوابق این فرد</h5>
+        <div class="val" id="p_totalLogs">۰</div>
+      </div>
+      <div class="sum-card">
+        <h5>مجموع مثبت</h5>
+        <div class="val" style="color:var(--success);" id="p_totalPos">۰</div>
+      </div>
+      <div class="sum-card">
+        <h5>مجموع منفی</h5>
+        <div class="val" style="color:var(--danger);" id="p_totalNeg">۰</div>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>تاریخ و ساعت</th>
+            <th>شرح و علت فعالیت</th>
+            <th style="text-align:center;">امتیاز</th>
+            <th style="text-align:center;">عملیات</th>
+          </tr>
+        </thead>
+        <tbody id="profileTableBody">
+          <tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:30px;">از کادر بالا یک طلبه را جستجو و انتخاب کنید.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+</div>
+
+<script>
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzVbruiOgQrJP0qBYsyNIc-3yWO0OOxfZz68ra0arObhCI4dRH5G7B_g-2x1wFnk7zsjg/exec";
+  let allPeople = [];
+  let allActivities = [];
+  let currentProfilePersonId = "";
+
+  function getApiToken() {
+    return document.getElementById("apiToken").value.trim();
+  }
+
+  function showToast(msg, type = "info") {
+    const toast = document.getElementById("statusToast");
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `<i class="fa-solid ${type==='success'?'fa-circle-check':'fa-triangle-exclamation'}"></i> <span>${msg}</span>`;
+    toast.style.display = "flex";
+  }
+  function hideToast() { document.getElementById("statusToast").style.display = "none"; }
+  function setScore(val) { document.getElementById("score").value = val; }
+
+  function switchTab(tab) {
+    document.getElementById("sectionRegister").style.display = (tab === 'register') ? 'block' : 'none';
+    document.getElementById("sectionHistory").style.display = (tab === 'history') ? 'block' : 'none';
+    document.getElementById("sectionProfile").style.display = (tab === 'profile') ? 'block' : 'none';
+
+    document.getElementById("tabBtnRegister").classList.toggle("active", tab === 'register');
+    document.getElementById("tabBtnHistory").classList.toggle("active", tab === 'history');
+    document.getElementById("tabBtnProfile").classList.toggle("active", tab === 'profile');
+
+    if (tab === 'history') loadActivities();
+  }
+
+  async function apiCall(action, payload = {}) {
+    const res = await fetch(SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ action, token: getApiToken(), ...payload })
+    });
+
+    const text = await res.text();
+    try {
+      return JSON.parse(text);
+    } catch (e) {
+      throw new Error("پاسخ سرور JSON نیست. (احتمالاً مشکل Deploy/Access دارید)\n" + text.slice(0, 200));
+    }
+  }
+
+  async function loadPeople() {
+    try {
+      const res = await apiCall("listPeople");
+      if (!res.ok) return showToast(res.error || "خطا در دریافت لیست", "error");
+      allPeople = res.people || [];
+      filterPeople();
+    } catch (e) {
+      console.error(e);
+      showToast("خطا در ارتباط با سرور (لیست طلاب).", "error");
+    }
+  }
+
+  function filterPeople() {
+    const query = document.getElementById("searchBox").value.trim().toLowerCase();
+    const grade = document.getElementById("gradeFilter").value;
+    const box = document.getElementById("peopleContainer");
+
+    const filtered = allPeople.filter(p => {
+      const matchQuery =
+        (p.fullName && p.fullName.toLowerCase().includes(query)) ||
+        (p.fileNo && String(p.fileNo).includes(query));
+      const matchGrade = (grade === "all") || (p.grade === grade);
+      return matchQuery && matchGrade;
+    });
+
+    document.getElementById("visibleCount").textContent = filtered.length;
+
+    if (!filtered.length) {
+      box.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:30px; color: var(--text-muted);">موردی یافت نشد.</div>`;
+      return;
+    }
+
+    box.innerHTML = filtered.map(p => `
+      <div class="student-card" id="card_${p.id}" onclick="togglePerson('${p.id}')">
+        <input type="checkbox" name="selectedPerson" value="${p.id}" id="chk_${p.id}" onclick="event.stopPropagation(); updateCount();" />
+        <div style="flex:1;">
+          <div class="student-name">${p.fullName}</div>
+          <div class="student-meta">
+            <span class="badge badge-grade">${p.grade}</span>
+            <span>پرونده: <strong>${p.fileNo || '—'}</strong></span>
+          </div>
+        </div>
+      </div>
+    `).join("");
+
+    updateCount();
+  }
+
+  function togglePerson(id) {
+    const chk = document.getElementById(`chk_${id}`);
+    chk.checked = !chk.checked;
+    document.getElementById(`card_${id}`).classList.toggle("selected", chk.checked);
+    updateCount();
+  }
+
+  function updateCount() {
+    const checked = document.querySelectorAll('input[name="selectedPerson"]:checked');
+    document.getElementById("selectedBadge").textContent = checked.length;
+    document.querySelectorAll('.student-card').forEach(c => {
+      const cb = c.querySelector('input[type="checkbox"]');
+      if (cb) c.classList.toggle("selected", cb.checked);
+    });
+  }
+
+  let selectAllState = false;
+  function toggleSelectAll() {
+    selectAllState = !selectAllState;
+    document.querySelectorAll('input[name="selectedPerson"]').forEach(cb => cb.checked = selectAllState);
+    updateCount();
+  }
+
+  function getSelectedIds() {
+    return Array.from(document.querySelectorAll('input[name="selectedPerson"]:checked')).map(cb => cb.value);
+  }
+
+  async function saveActivity() {
+    hideToast();
+    const personIds = getSelectedIds();
+    const score = document.getElementById("score").value;
+    const description = document.getElementById("description").value;
+
+    if (!personIds.length) return showToast("حداقل یک طلبه را انتخاب کنید.", "error");
+    if (!score) return showToast("لطفاً امتیاز را مشخص کنید.", "error");
+
+    const btn = document.getElementById("btnSave");
+    btn.disabled = true;
+    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> در حال ثبت...`;
+
+    try {
+      const res = await apiCall("addActivity", { personIds, score, description });
+      if (!res.ok) return showToast(res.error || "خطا در ثبت", "error");
+
+      showToast(`ثبت شد: ${res.count} مورد`, "success");
+      document.getElementById("description").value = "";
+      document.querySelectorAll('input[name="selectedPerson"]').forEach(cb => cb.checked = false);
+      updateCount();
+    } catch (e) {
+      console.error(e);
+      showToast("خطا در ثبت اطلاعات.", "error");
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> ثبت سریع در سوابق`;
+    }
+  }
+
+  async function loadActivities() {
+    const tbody = document.getElementById("historyTableBody");
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:30px;"><i class="fa-solid fa-spinner fa-spin"></i> در حال دریافت سوابق...</td></tr>`;
+
+    try {
+      const res = await apiCall("listActivities");
+      if (!res.ok) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--danger); padding:20px;">${res.error || 'خطا در دریافت سوابق'}</td></tr>`;
+        return;
+      }
+      allActivities = res.activities || [];
+      renderHistory(allActivities);
+    } catch (e) {
+      console.error(e);
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--danger); padding:20px;">خطا در ارتباط با سرور.</td></tr>`;
+    }
+  }
+
+  function renderHistory(list) {
+    const tbody = document.getElementById("historyTableBody");
+    document.getElementById("totalLogs").textContent = list.length;
+
+    let pos = 0, neg = 0;
+    list.forEach(a => (a.score > 0 ? pos += a.score : neg += a.score));
+    document.getElementById("totalPos").textContent = `+${pos}`;
+    document.getElementById("totalNeg").textContent = `${neg}`;
+
+    if (!list.length) {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--text-muted); padding:30px;">هیچ سابقه‌ای ثبت نشده است.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = list.map(a => `
+      <tr>
+        <td style="font-size:11.5px; color:var(--text-muted);">${a.date}</td>
+        <td><strong>${a.fullName}</strong></td>
+        <td><span class="badge badge-grade">${a.grade}</span></td>
+        <td>
+          <span class="score-tag ${a.score >= 0 ? 'score-pos' : 'score-neg'}">
+            ${a.score >= 0 ? '+' + a.score : a.score}
+          </span>
+        </td>
+        <td style="max-width:280px;">${a.description || '—'}</td>
+        <td>
+          <button onclick="deleteActivity('${a.id}')" style="background:#fee2e2; color:#dc2626; border:none; padding:4px 8px; border-radius:6px; cursor:pointer; font-size:11px;">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        </td>
+      </tr>
+    `).join("");
+  }
+
+  function filterHistory() {
+    const q = document.getElementById("historySearch").value.trim().toLowerCase();
+    const filtered = allActivities.filter(a =>
+      (a.fullName || "").toLowerCase().includes(q) ||
+      (a.grade || "").toLowerCase().includes(q) ||
+      (a.description || "").toLowerCase().includes(q)
+    );
+    renderHistory(filtered);
+  }
+
+  async function deleteActivity(id) {
+    if (!confirm("آیا از حذف این سابقه اطمینان دارید؟")) return;
+    try {
+      const res = await apiCall("deleteActivity", { id });
+      if (!res.ok) return alert(res.error || "خطا در حذف");
+      loadActivities();
+    } catch(e) {
+      alert("خطا در حذف سابقه.");
+    }
+  }
+
+  async function generateSeparatePdfs() {
+    hideToast();
+    const personIds = getSelectedIds();
+    const score = document.getElementById("score").value;
+    const description = document.getElementById("description").value;
+
+    if (!personIds.length) return showToast("حداقل یک طلبه را انتخاب کنید.", "error");
+    if (!score) return showToast("لطفاً امتیاز را مشخص کنید.", "error");
+
+    const btn = document.getElementById("btnPdf");
+    btn.disabled = true;
+    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> در حال صدور PDF...`;
+
+    try {
+      const res = await apiCall("generateSeparatePdfs", { personIds, score, description });
+      if (!res.ok) return showToast(res.error || "خطا در ساخت PDF", "error");
+
+      showToast(`تعداد ${res.files.length} حکم صادر شد.`, "success");
+
+      const area = document.getElementById("pdfResultsArea");
+      const container = document.getElementById("pdfCardsContainer");
+      area.style.display = "block";
+      container.innerHTML = res.files.map(f => `
+        <a class="pdf-card" href="${f.downloadUrl}" target="_blank">
+          <div>
+            <div style="font-weight:bold; font-size:12.5px; color:var(--primary);"><i class="fa-solid fa-file-pdf" style="color:var(--danger);"></i> ${f.personName}</div>
+            <div style="font-size:11px; color:var(--text-muted);">${f.grade} | شماره حکم: ${f.letterNo}</div>
+          </div>
+          <i class="fa-solid fa-arrow-up-right-from-square" style="color:var(--primary); font-size:12px;"></i>
+        </a>
+      `).join("");
+    } catch (e) {
+      console.error(e);
+      showToast("خطا در ساخت PDF.", "error");
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = `<i class="fa-solid fa-file-pdf"></i> صدور احکام PDF`;
+    }
+  }
+
+  /* --- بخش اختصاصی پرونده طلبه با قابلیت جستجوی زنده --- */
+
+  function onProfileSearchFocus() {
+    renderProfileDropdown(document.getElementById("profileSearchInput").value);
+  }
+
+  function onProfileSearchInput() {
+    const q = document.getElementById("profileSearchInput").value;
+    document.getElementById("clearProfileSearchBtn").style.display = q ? "block" : "none";
+    renderProfileDropdown(q);
+  }
+
+  function renderProfileDropdown(query = "") {
+    const dropdown = document.getElementById("profileDropdown");
+    const q = query.trim().toLowerCase();
+
+    const filtered = allPeople.filter(p => {
+      return (p.fullName && p.fullName.toLowerCase().includes(q)) ||
+             (p.fileNo && String(p.fileNo).toLowerCase().includes(q)) ||
+             (p.grade && p.grade.toLowerCase().includes(q));
+    });
+
+    if (!filtered.length) {
+      dropdown.innerHTML = `<div style="padding:12px; font-size:12.5px; color:var(--text-muted); text-align:center;">طلبه‌ای یافت نشد.</div>`;
+      dropdown.style.display = "block";
+      return;
+    }
+
+    dropdown.innerHTML = filtered.map(p => `
+      <div class="search-result-item" onclick="selectPersonForProfile('${p.id}')">
+        <div>
+          <strong style="font-size:13px; color:var(--text-main);">${p.fullName}</strong>
+          <span style="font-size:11px; color:var(--text-muted); margin-right:6px;">(${p.grade})</span>
+        </div>
+        <span style="font-size:11px; background:#f1f5f9; padding:2px 6px; border-radius:4px; color:var(--text-muted);">
+          پرونده: ${p.fileNo || '—'}
+        </span>
+      </div>
+    `).join("");
+
+    dropdown.style.display = "block";
+  }
+
+  function selectPersonForProfile(personId) {
+    const p = allPeople.find(x => x.id === personId);
+    if (!p) return;
+
+    currentProfilePersonId = p.id;
+    document.getElementById("profileSearchInput").value = p.fullName;
+    document.getElementById("profileDropdown").style.display = "none";
+    document.getElementById("clearProfileSearchBtn").style.display = "block";
+
+    // بروزرسانی بج مشخصات فرد
+    document.getElementById("p_dispName").textContent = p.fullName;
+    document.getElementById("p_dispGrade").textContent = p.grade || "—";
+    document.getElementById("p_dispFileNo").textContent = p.fileNo || "—";
+    document.getElementById("selectedPersonInfo").style.display = "flex";
+
+    loadPersonProfile(p.id);
+  }
+
+  function clearProfileSelection() {
+    currentProfilePersonId = "";
+    document.getElementById("profileSearchInput").value = "";
+    document.getElementById("profileDropdown").style.display = "none";
+    document.getElementById("clearProfileSearchBtn").style.display = "none";
+    document.getElementById("selectedPersonInfo").style.display = "none";
+
+    document.getElementById("p_totalLogs").textContent = "۰";
+    document.getElementById("p_totalPos").textContent = "۰";
+    document.getElementById("p_totalNeg").textContent = "۰";
+    document.getElementById("profileTableBody").innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:30px;">از کادر بالا یک طلبه را جستجو و انتخاب کنید.</td></tr>`;
+  }
+
+  // بستن منوی کشویی جستجو با کلیک بیرون از کادر
+  document.addEventListener("click", function(e) {
+    const wrapper = document.querySelector(".search-select-wrapper");
+    if (wrapper && !wrapper.contains(e.target)) {
+      const dd = document.getElementById("profileDropdown");
+      if (dd) dd.style.display = "none";
+    }
+  });
+
+  async function loadPersonProfile(pid) {
+    const tbody = document.getElementById("profileTableBody");
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:30px;"><i class="fa-solid fa-spinner fa-spin"></i> در حال دریافت پرونده...</td></tr>`;
+
+    try {
+      const res = await apiCall("getPersonProfile", { personId: pid });
+      if (!res.ok) throw new Error(res.error || "خطا در دریافت پرونده");
+
+      document.getElementById("p_totalLogs").textContent = res.totals.count;
+      document.getElementById("p_totalPos").textContent = `+${res.totals.pos}`;
+      document.getElementById("p_totalNeg").textContent = `${res.totals.neg}`;
+
+      const list = res.activities || [];
+      if (!list.length) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:30px;">سابقه‌ای برای این فرد ثبت نشده است.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list.map(a => `
+        <tr>
+          <td style="font-size:11.5px; color:var(--text-muted);">${a.date}</td>
+          <td style="max-width:420px;">${a.description || "—"}</td>
+          <td style="text-align:center;">
+            <span class="score-tag ${a.score >= 0 ? 'score-pos' : 'score-neg'}">
+              ${a.score >= 0 ? '+' + a.score : a.score}
+            </span>
+          </td>
+          <td style="text-align:center;">
+            <button onclick="deleteActivityAndRefreshProfile('${a.id}')" style="background:#fee2e2; color:#dc2626; border:none; padding:4px 8px; border-radius:6px; cursor:pointer; font-size:11px;">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+      `).join("");
+
+    } catch (e) {
+      console.error(e);
+      tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--danger); padding:20px;">${e.message || "خطا در ارتباط با سرور"}</td></tr>`;
+    }
+  }
+
+  async function deleteActivityAndRefreshProfile(id) {
+    if (!confirm("آیا از حذف این سابقه اطمینان دارید؟")) return;
+    try {
+      const res = await apiCall("deleteActivity", { id });
+      if (!res.ok) return alert(res.error || "خطا در حذف");
+      if (currentProfilePersonId) await loadPersonProfile(currentProfilePersonId);
+    } catch(e) {
+      alert("خطا در حذف سابقه.");
+    }
+  }
+
+  async function generatePersonProfilePdf() {
+    if (!currentProfilePersonId) return alert("لطفاً ابتدا یک طلبه را جستجو و انتخاب کنید.");
+
+    try {
+      const res = await apiCall("generatePersonProfilePdf", { personId: currentProfilePersonId });
+      if (!res.ok) return alert(res.error || "خطا در ساخت PDF");
+      window.open(res.downloadUrl, "_blank");
+    } catch(e) {
+      alert("خطا در ساخت PDF کارنامه فردی.");
+    }
+  }
+
+  async function generateOverallPdf() {
+    try {
+      const res = await apiCall("generateOverallReportPdf");
+      if (!res.ok) return alert(res.error || "خطا در ساخت PDF جامع");
+      window.open(res.downloadUrl, "_blank");
+    } catch(e) {
+      alert("خطا در ساخت PDF جامع.");
+    }
+  }
+
+  loadPeople();
+</script>
+</body>
+</html>

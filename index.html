@@ -483,7 +483,7 @@
   let currentProfilePersonId = "";
   let chartInstance = null;
 
-  function GAPGPTMASKTOKEN8q2xpu5asvmX1X {
+  function GAPGPTMASKTOKENmjuo74lowupX1X {
     return document.getElementById("apiToken").value.trim();
   }
 
@@ -515,7 +515,7 @@
     const res = await fetch(SCRIPT_URL, {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({ action, token: GAPGPTMASKTOKEN8q2xpu5asvmX2X, ...payload })
+      body: JSON.stringify({ action, token: GAPGPTMASKTOKENmjuo74lowupX2X, ...payload })
     });
 
     const text = await res.text();

@@ -7,8 +7,7 @@
   
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- کتابخانه نمودارساز Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
   <style>
     :root {
@@ -31,7 +30,7 @@
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Vazirmatn', Tahoma, sans-serif; }
     body { background-color: var(--bg); color: var(--text-main); padding: 25px 12px; min-height: 100vh; display: flex; justify-content: center; }
-    .app-container { width: 100%; max-width: 1100px; display: flex; flex-direction: column; gap: 18px; }
+    .app-container { width: 100%; max-width: 1050px; display: flex; flex-direction: column; gap: 18px; }
 
     /* هدر */
     .app-header {
@@ -49,7 +48,7 @@
     .tab-btn {
       flex: 1; min-width: 140px; padding: 10px 14px; border: none; background: transparent; font-weight: 700;
       font-size: 13px; border-radius: 8px; cursor: pointer; color: var(--text-muted);
-      display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s;
+      display: flex; align-items: center; justify-content: center; gap: 7px; transition: 0.2s;
     }
     .tab-btn.active { background: white; color: var(--primary); box-shadow: var(--shadow); }
 
@@ -106,6 +105,59 @@
       font-size: 13px; outline: none; background: #f8fafc;
     }
 
+    /* استایل بخش برچسب‌های سریع */
+    .tags-panel {
+      margin-top: 12px;
+      background: #f8fafc;
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+    .tags-panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .tags-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .tag-chip {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 20px;
+      padding: 4px 10px;
+      font-size: 11.5px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s;
+      user-select: none;
+    }
+    .tag-chip:hover {
+      background: var(--primary-soft);
+      border-color: var(--primary-light);
+      color: var(--primary);
+      transform: translateY(-1px);
+    }
+    .tag-chip-score {
+      font-size: 10px;
+      font-weight: 800;
+      padding: 1px 6px;
+      border-radius: 10px;
+    }
+    .tag-chip-score.pos { background: var(--success-soft); color: var(--success); }
+    .tag-chip-score.neg { background: var(--danger-soft); color: var(--danger); }
+    .tag-chip-delete {
+      color: #94a3b8;
+      font-size: 10px;
+      margin-right: 2px;
+    }
+    .tag-chip-delete:hover { color: var(--danger); }
+
     .action-buttons { display: flex; gap: 12px; margin-top: 16px; }
     .btn {
       flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -122,7 +174,7 @@
     .toast.success { background: var(--success-soft); color: var(--success); border: 1px solid #a7f3d0; }
     .toast.error { background: var(--danger-soft); color: var(--danger); border: 1px solid #fecaca; }
 
-    /* جدول سوابق */
+    /* جدول نمایش سوابق */
     .table-container { overflow-x: auto; margin-top: 15px; }
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
     th { background: #f1f5f9; color: var(--text-main); padding: 10px; text-align: right; border-bottom: 2px solid var(--border); }
@@ -132,7 +184,11 @@
     .score-pos { background: var(--success-soft); color: var(--success); }
     .score-neg { background: var(--danger-soft); color: var(--danger); }
 
-    .summary-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 15px; }
+    .summary-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 15px; }
+    .summary-cards-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 15px; }
+    @media (max-width: 768px) {
+      .summary-cards-4 { grid-template-columns: repeat(2, 1fr); }
+    }
     .sum-card { background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 12px; text-align: center; }
     .sum-card h5 { font-size: 11.5px; color: var(--text-muted); margin-bottom: 4px; }
     .sum-card .val { font-size: 18px; font-weight: 800; }
@@ -140,7 +196,7 @@
     .pdf-results { margin-top: 15px; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
     .pdf-card { background: white; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px; display: flex; justify-content: space-between; align-items: center; text-decoration: none; color: inherit; }
 
-    /* استایل‌های اختصاصی جستجوی زنده پرونده */
+    /* استایل‌های جستجوی پرونده */
     .search-select-wrapper { position: relative; flex: 1; min-width: 260px; }
     .search-results-dropdown {
       position: absolute; top: 100%; left: 0; right: 0; max-height: 240px; overflow-y: auto;
@@ -148,8 +204,8 @@
       box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 100; display: none;
     }
     .search-result-item {
-      padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #f1f5f9; display: flex;
-      justify-content: space-between; align-items: center; transition: background 0.15s;
+      padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #f1f5f9;
+      display: flex; justify-content: space-between; align-items: center; transition: background 0.15s;
     }
     .search-result-item:last-child { border-bottom: none; }
     .search-result-item:hover { background: var(--primary-soft); }
@@ -158,20 +214,33 @@
       border: 1px solid #bfdbfe; border-radius: 8px; padding: 8px 12px; margin-bottom: 12px;
     }
 
-    /* کارت برآیند کل امتیاز طلبه */
-    .total-score-box {
-      border: 2px solid var(--primary-light);
-      background: #f0f7ff;
+    /* استایل‌های نمودار رتبه‌بندی */
+    .ranking-container { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
+    .rank-row {
+      display: grid; grid-template-columns: 36px 140px 1fr 85px; align-items: center; gap: 12px;
+      background: #f8fafc; border: 1px solid var(--border); padding: 9px 12px; border-radius: 8px;
     }
+    .rank-number {
+      width: 30px; height: 30px; border-radius: 50%; background: #e2e8f0; color: #334155;
+      font-weight: 800; font-size: 12px; display: flex; align-items: center; justify-content: center;
+    }
+    .rank-top-1 { background: #fef3c7; color: #b45309; border: 1px solid #fcd34d; }
+    .rank-top-2 { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+    .rank-top-3 { background: #ffedd5; color: #c2410c; border: 1px solid #fdba74; }
+    .rank-bar-bg { width: 100%; height: 14px; background: #e2e8f0; border-radius: 7px; overflow: hidden; position: relative; }
+    .rank-bar-fill { height: 100%; border-radius: 7px; transition: width 0.4s ease; }
+    .rank-bar-pos { background: linear-gradient(90deg, #10b981, #059669); }
+    .rank-bar-neg { background: linear-gradient(90deg, #ef4444, #dc2626); }
+    .rank-bar-tag { background: linear-gradient(90deg, #6366f1, #4f46e5); }
 
-    /* استایل‌های تب رتبه‌بندی و نمودار */
-    .ranking-toolbar {
-      display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: space-between;
-      background: #f8fafc; padding: 12px 16px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 15px;
+    /* مدال تعریف برچسب */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4);
+      display: none; align-items: center; justify-content: center; z-index: 1000; padding: 15px;
     }
-    .chart-container-card {
-      background: #ffffff; border: 1px solid var(--border); border-radius: 10px; padding: 16px;
-      margin-bottom: 20px; position: relative;
+    .modal-box {
+      background: white; border-radius: var(--radius); padding: 20px;
+      max-width: 400px; width: 100%; box-shadow: 0 10px 25px rgba(0,0,0,0.15);
     }
   </style>
 </head>
@@ -199,7 +268,7 @@
       <i class="fa-solid fa-id-card"></i> پرونده اختصاصی طلبه
     </button>
     <button class="tab-btn" id="tabBtnRanking" onclick="switchTab('ranking')">
-      <i class="fa-solid fa-chart-column"></i> رتبه‌بندی و نمودار تحلیلی
+      <i class="fa-solid fa-chart-column"></i> نمودار و رتبه‌بندی طلاب
     </button>
   </div>
 
@@ -212,7 +281,7 @@
           <input type="password" id="apiToken" value="123456" />
         </div>
       </div>
-      <span style="font-size:11.5px; color:var(--text-muted);">نسخه جامع تحلیلی و رتبه‌بندی</span>
+      <span style="font-size:11.5px; color:var(--text-muted);">نسخه جامع و ارتقاء‌یافته</span>
     </div>
   </div>
 
@@ -225,7 +294,7 @@
       </div>
 
       <select id="gradeFilter" class="custom-select" onchange="filterPeople()">
-        <option value="all">تمام پایه‌ها</option>
+        <option value="all">همه پایه‌ها</option>
         <option value="پایه ۱">پایه ۱</option>
         <option value="پایه ۲">پایه ۲</option>
         <option value="پایه ۳">پایه ۳</option>
@@ -235,13 +304,13 @@
         <option value="پایه ۷">پایه ۷</option>
       </select>
 
-      <button onclick="toggleSelectAll()" class="btn" style="background:#f1f5f9; color:var(--text-main); border:1px solid var(--border); padding: 8px 12px; font-size: 12px;">
+      <button class="btn" style="background:#e2e8f0; color:var(--text-main); font-size:12px; padding:0 14px;" onclick="toggleSelectAll()">
         <i class="fa-solid fa-check-double"></i> انتخاب همه
       </button>
     </div>
 
     <div class="selection-controls">
-      <div>نمایش: <strong id="visibleCount">۰</strong> طلبه</div>
+      <span>برای ثبت گروهی، روی اسامی طلاب کلیک نمایید.</span>
       <div>انتخاب‌شده: <span class="badge badge-count" id="selectedBadge">۰</span> نفر</div>
     </div>
 
@@ -267,7 +336,22 @@
 
       <div>
         <label style="font-size: 12.5px; font-weight: 700; display: block; margin-bottom: 4px;">علت و متن حکم:</label>
-        <textarea id="description" rows="2" placeholder="توضیحات تشویق یا تذکر انضباطی..."></textarea>
+        <textarea id="description" rows="2" placeholder="توضیحات تشویق یا تذکر انضباطی یا کلیک روی برچسب‌های سریع زیر..."></textarea>
+      </div>
+    </div>
+
+    <!-- بخش کلیدهای برچسب‌های عمومی زیر توضیحات -->
+    <div class="tags-panel">
+      <div class="tags-panel-header">
+        <span style="font-size: 12px; font-weight: 700; color: var(--text-muted);">
+          <i class="fa-solid fa-tags" style="color:var(--primary);"></i> برچسب‌های فعالیت سریع (درج فوری شرح و امتیاز):
+        </span>
+        <button onclick="openNewTagModal()" style="background: none; border: none; color: var(--primary); font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+          <i class="fa-solid fa-circle-plus"></i> افزودن برچسب جدید
+        </button>
+      </div>
+      <div class="tags-container" id="tagsContainer">
+        <!-- برچسب‌ها با جاوااسکریپت پر می‌شوند -->
       </div>
     </div>
 
@@ -291,28 +375,28 @@
 
   <!-- صفحه ۲: سوابق و نمرات کلی -->
   <main class="card" id="sectionHistory" style="display:none;">
-    <div class="summary-cards" style="grid-template-columns: repeat(3, 1fr);">
+    <div class="summary-cards">
       <div class="sum-card">
-        <h5>تعداد کل موارد ثبت‌شده</h5>
-        <div class="val" id="totalLogs">۰</div>
+        <h5>تعداد کل ثبت‌ها</h5>
+        <div class="val" id="totalLogs" style="color:var(--primary);">۰</div>
       </div>
       <div class="sum-card">
-        <h5>مجموع امتیازات مثبت</h5>
-        <div class="val" style="color:var(--success);" id="totalPos">۰</div>
+        <h5>مجموع امتیاز مثبت</h5>
+        <div class="val" id="totalPos" style="color:var(--success);">+۰</div>
       </div>
       <div class="sum-card">
-        <h5>مجموع کسر امتیازات</h5>
-        <div class="val" style="color:var(--danger);" id="totalNeg">۰</div>
+        <h5>مجموع کسر امتیاز</h5>
+        <div class="val" id="totalNeg" style="color:var(--danger);">۰</div>
       </div>
     </div>
 
-    <div style="display:flex; gap:10px; margin-bottom:12px;">
-      <div class="input-group" style="flex:1;">
+    <div class="filter-section" style="grid-template-columns: 1fr auto;">
+      <div class="input-group">
         <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" id="historySearch" placeholder="جستجو در سوابق (نام، پایه یا توضیح)..." oninput="filterHistory()" />
+        <input type="text" id="historySearch" placeholder="جستجو در نام طلبه یا شرح فعالیت..." oninput="filterHistory()" />
       </div>
-      <button onclick="loadActivities()" class="btn" style="background:#f1f5f9; color:var(--text-main); border:1px solid var(--border); flex:none; padding:8px 14px; font-size:12.5px;">
-        <i class="fa-solid fa-rotate"></i> بروزرسانی
+      <button class="btn" style="background:#e2e8f0; color:var(--text-main); font-size:12.5px; padding:0 16px;" onclick="loadActivities()">
+        <i class="fa-solid fa-rotate"></i> به‌روزرسانی
       </button>
     </div>
 
@@ -320,16 +404,16 @@
       <table>
         <thead>
           <tr>
-            <th>تاریخ و ساعت</th>
-            <th>نام طلبه</th>
+            <th>نام و نام خانوادگی</th>
             <th>پایه</th>
             <th>امتیاز</th>
-            <th>شرح و علت</th>
-            <th>عملیات</th>
+            <th>شرح فعالیت</th>
+            <th>تاریخ و زمان ثبت</th>
+            <th style="width: 40px;">عملیات</th>
           </tr>
         </thead>
         <tbody id="historyTableBody">
-          <tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding:30px;">در حال بارگذاری سوابق...</td></tr>
+          <tr><td colspan="6" style="text-align:center; padding: 25px; color: var(--text-muted);"><i class="fa-solid fa-spinner fa-spin"></i> در حال دریافت سوابق...</td></tr>
         </tbody>
       </table>
     </div>
@@ -337,698 +421,891 @@
 
   <!-- صفحه ۳: پرونده اختصاصی طلبه -->
   <main class="card" id="sectionProfile" style="display:none;">
-    <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:15px; background:#f8fafc; padding:12px; border-radius:8px; border:1px solid var(--border);">
+    <div class="filter-section" style="grid-template-columns: 1fr auto; align-items: start; margin-bottom: 12px;">
       <div class="search-select-wrapper">
-        <div class="input-group" style="background: white;">
-          <i class="fa-solid fa-magnifying-glass"></i>
-          <input type="text" id="profileSearchInput" placeholder="جستجوی طلبه با نام، شماره پرونده یا پایه..." oninput="onProfileSearchInput()" onfocus="onProfileSearchFocus()" autocomplete="off" />
-          <i class="fa-solid fa-xmark" id="clearProfileSearchBtn" style="cursor:pointer; display:none;" onclick="clearProfileSelection()"></i>
+        <div class="input-group">
+          <i class="fa-solid fa-user"></i>
+          <input type="text" id="profileSearchInput" placeholder="جستجو و انتخاب نام طلبه..." onfocus="onProfileSearchFocus()" oninput="onProfileSearchInput()" autocomplete="off" />
         </div>
-        <div id="profileDropdown" class="search-results-dropdown"></div>
+        <div class="search-results-dropdown" id="profileDropdown"></div>
       </div>
 
-      <button onclick="generatePersonProfilePdf()" class="btn btn-pdf" style="flex:none; padding:8px 14px; font-size:12.5px;">
-        <i class="fa-solid fa-file-pdf"></i> PDF کارنامه فرد
-      </button>
-
-      <button onclick="generateOverallPdf()" class="btn btn-primary" style="flex:none; padding:8px 14px; font-size:12.5px;">
-        <i class="fa-solid fa-print"></i> PDF گزارش جامع همه طلاب
+      <button class="btn" style="background:#e2e8f0; color:var(--text-main); font-size:12.5px; padding:9px 16px;" onclick="clearProfileSelection()">
+        <i class="fa-solid fa-xmark"></i> پاک‌کردن
       </button>
     </div>
 
-    <div id="selectedPersonInfo" class="selected-person-badge" style="display:none;">
+    <div id="selectedPersonBadge" class="selected-person-badge" style="display:none;">
       <div>
-        <i class="fa-solid fa-user-graduate" style="color:var(--primary); margin-left:6px;"></i>
-        طلبه انتخاب‌شده: <strong id="p_dispName" style="color:var(--primary); font-size:13.5px;">-</strong>
-        <span style="margin:0 6px; color:var(--text-muted);">|</span>
-        پایه: <span id="p_dispGrade" class="badge badge-grade">-</span>
-        <span style="margin:0 6px; color:var(--text-muted);">|</span>
-        شماره پرونده: <strong id="p_dispFileNo">-</strong>
+        <span style="font-weight: 800; font-size: 13.5px; color: var(--primary);" id="pBadgeName">—</span>
+        <span style="font-size: 11.5px; color: var(--text-muted); margin-right: 8px;" id="pBadgeMeta">—</span>
       </div>
-      <button onclick="clearProfileSelection()" style="background:transparent; border:none; color:var(--danger); cursor:pointer; font-size:12px; font-weight:bold;">
-        <i class="fa-solid fa-arrow-rotate-right"></i> تغییر طلبه
-      </button>
+      <span class="badge" style="background:#dbeafe; color:var(--primary); font-size:11px;">پرونده فعال</span>
     </div>
 
-    <!-- کارت‌های آماری پرونده اختصاصی همراه با کادر شاخص مجموع امتیازات -->
-    <div class="summary-cards">
-      <div class="sum-card total-score-box">
-        <h5 style="color:var(--primary); font-weight:bold;"><i class="fa-solid fa-award"></i> مجموع کل نهایی امتیازات</h5>
-        <div class="val" id="p_totalScore" style="color:var(--primary); font-size:22px;">۰</div>
+    <div class="summary-cards-4">
+      <div class="sum-card">
+        <h5>تعداد فعالیت</h5>
+        <div class="val" id="p_totalLogs" style="color:var(--text-main);">۰</div>
       </div>
       <div class="sum-card">
-        <h5>مجموع امتیازات مثبت</h5>
-        <div class="val" style="color:var(--success);" id="p_totalPos">۰</div>
+        <h5>مجموع مثبت</h5>
+        <div class="val" id="p_totalPos" style="color:var(--success);">+۰</div>
       </div>
       <div class="sum-card">
-        <h5>مجموع کسر امتیازات</h5>
-        <div class="val" style="color:var(--danger);" id="p_totalNeg">۰</div>
+        <h5>مجموع منفی</h5>
+        <div class="val" id="p_totalNeg" style="color:var(--danger);">۰</div>
       </div>
       <div class="sum-card">
-        <h5>تعداد دفعات ثبت</h5>
-        <div class="val" id="p_totalLogs">۰</div>
+        <h5>تراز نهایی کارنامه</h5>
+        <div class="val" id="p_netScore" style="color:var(--primary);">۰</div>
       </div>
+    </div>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin: 15px 0 8px 0;">
+      <h4 style="font-size: 13px; font-weight: 700; color: var(--text-main);">تاریخچه کلیه امتیازات ثبت‌شده برای این طلبه:</h4>
+      <button class="btn btn-pdf" id="btnPersonPdf" style="max-width: 220px; font-size: 12px; padding: 7px 12px;" onclick="generatePersonProfilePdf()" disabled>
+        <i class="fa-solid fa-file-pdf"></i> صدور PDF کارنامه این طلبه
+      </button>
     </div>
 
     <div class="table-container">
       <table>
         <thead>
           <tr>
-            <th>تاریخ و ساعت</th>
-            <th>شرح و علت فعالیت</th>
-            <th style="text-align:center;">امتیاز</th>
-            <th style="text-align:center;">عملیات</th>
+            <th>تاریخ و زمان</th>
+            <th>علت و شرح</th>
+            <th>امتیاز</th>
+            <th style="width: 40px;">عملیات</th>
           </tr>
         </thead>
-        <tbody id="profileTableBody">
-          <tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:30px;">از کادر بالا یک طلبه را جستجو و انتخاب کنید.</td></tr>
+        <tbody id="profileActivitiesBody">
+          <tr><td colspan="4" style="text-align:center; padding: 25px; color: var(--text-muted);">طلبه‌ای انتخاب نشده است. لطفاً از کادر بالا نام طلبه را جستجو فرمایید.</td></tr>
         </tbody>
       </table>
+    </div>
+
+    <!-- گزارش جامع -->
+    <div style="margin-top: 25px; border-top: 1px dashed var(--border); padding-top: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+      <div>
+        <h4 style="font-size: 13.5px; font-weight: 800; color: var(--primary);"><i class="fa-solid fa-book-bookmark"></i> صدور کارنامه جامع همه طلاب</h4>
+        <p style="font-size: 11.5px; color: var(--text-muted); margin-top: 2px;">یک سند PDF رسمی شامل لیست تمام طلاب، جمع امتیازات مثبت، منفی و تراز کلی هر فرد</p>
+      </div>
+      <button class="btn btn-primary" id="btnOverallPdf" style="max-width: 240px; font-size: 12.5px; padding: 9px 14px;" onclick="generateOverallPdf()">
+        <i class="fa-solid fa-file-arrow-down"></i> دریافت PDF گزارش جامع کلی
+      </button>
     </div>
   </main>
 
-  <!-- صفحه ۴: رتبه‌بندی و نمودار تحلیلی -->
+  <!-- صفحه ۴: بخش نمودار و رتبه‌بندی -->
   <main class="card" id="sectionRanking" style="display:none;">
-    <div class="ranking-toolbar">
-      <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-        <label style="font-size:12.5px; font-weight:bold;">معیار رتبه‌بندی:</label>
-        <select id="rankingCriterion" class="custom-select" onchange="renderRankingChart()">
-          <option value="pos">بیشترین امتیاز مثبت (تشویق‌ها)</option>
-          <option value="total">بالاترین برآیند مجموع امتیاز</option>
-          <option value="neg">بیشترین کسر امتیاز (منفی‌ترین‌ها)</option>
-        </select>
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:15px; border-bottom:1px solid var(--border); padding-bottom:12px;">
+      <div>
+        <h3 style="font-size:15px; font-weight:800; color:var(--primary);"><i class="fa-solid fa-chart-simple"></i> رتبه‌بندی و مقایسه عملکرد طلاب</h3>
+        <p style="font-size:11.5px; color:var(--text-muted); margin-top:2px;">نمایش مقایسه‌ای طلاب بر اساس امتیازات کلی یا برچسب فعالیت‌های خاص</p>
+      </div>
+      <button class="btn" onclick="exportRankingImage()" style="background:#0284c7; color:white; flex:none; padding:8px 14px; font-size:12.5px;">
+        <i class="fa-solid fa-camera"></i> دریافت خروجی تصویری (PNG)
+      </button>
+    </div>
 
-        <label style="font-size:12.5px; font-weight:bold; margin-right:8px;">تعداد نمایش:</label>
-        <select id="rankingLimit" class="custom-select" onchange="renderRankingChart()">
-          <option value="5">۵ نفر برتر</option>
-          <option value="10" selected>۱۰ نفر برتر</option>
-          <option value="15">۱۵ نفر برتر</option>
-          <option value="20">۲۰ نفر برتر</option>
-          <option value="all">همه طلاب</option>
+    <!-- فیلترهای نمودار -->
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap:10px; background:#f8fafc; padding:12px; border-radius:8px; border:1px solid var(--border); margin-bottom:16px;">
+      <div>
+        <label style="font-size:11.5px; font-weight:bold; display:block; margin-bottom:4px;">معیار رتبه‌بندی:</label>
+        <select id="rankMetric" class="custom-select" style="width:100%;" onchange="renderRankingChart()">
+          <option value="pos">مثبت‌ترین طلاب (بیشترین تشویق)</option>
+          <option value="neg">منفی‌ترین طلاب (بیشترین کسر امتیاز)</option>
+          <option value="net">برترین تراز نهایی (مثبت منهای منفی)</option>
+          <option value="tag">⭐ بر اساس برچسب فعالیت خاص</option>
         </select>
       </div>
 
-      <div style="display:flex; gap:8px;">
-        <button onclick="downloadChartImage()" class="btn btn-pdf" style="padding:8px 14px; font-size:12.5px;">
-          <i class="fa-solid fa-image"></i> خروجی تصویر نمودار (PNG)
-        </button>
-        <button onclick="loadRankingData()" class="btn" style="background:#f1f5f9; color:var(--text-main); border:1px solid var(--border); padding:8px 14px; font-size:12.5px;">
-          <i class="fa-solid fa-rotate"></i> بروزرسانی داده‌ها
-        </button>
+      <div id="rankTagFilterWrapper" style="display:none;">
+        <label style="font-size:11.5px; font-weight:bold; display:block; margin-bottom:4px; color:#4338ca;">برچسب مورد نظر:</label>
+        <select id="rankTagSelect" class="custom-select" style="width:100%;" onchange="renderRankingChart()">
+          <!-- لیست برچسب‌ها با اسکریپت پر می‌شود -->
+        </select>
+      </div>
+
+      <div>
+        <label style="font-size:11.5px; font-weight:bold; display:block; margin-bottom:4px;">پایه تحصیلی:</label>
+        <select id="rankGrade" class="custom-select" style="width:100%;" onchange="renderRankingChart()">
+          <option value="all">تمام پایه‌ها</option>
+          <option value="پایه ۱">پایه ۱</option>
+          <option value="پایه ۲">پایه ۲</option>
+          <option value="پایه ۳">پایه ۳</option>
+          <option value="پایه ۴">پایه ۴</option>
+          <option value="پایه ۵">پایه ۵</option>
+          <option value="پایه ۶">پایه ۶</option>
+          <option value="پایه ۷">پایه ۷</option>
+        </select>
+      </div>
+
+      <div>
+        <label style="font-size:11.5px; font-weight:bold; display:block; margin-bottom:4px;">تعداد طلاب در نمودار:</label>
+        <select id="rankCount" class="custom-select" style="width:100%;" onchange="renderRankingChart()">
+          <option value="5">۵ طلبه برتر</option>
+          <option value="10" selected>۱۰ طلبه برتر</option>
+          <option value="20">۲۰ طلبه برتر</option>
+          <option value="50">۵۰ طلبه برتر</option>
+          <option value="all">تمام طلاب واجد شرایط</option>
+        </select>
       </div>
     </div>
 
-    <!-- بدنه نمودار -->
-    <div class="chart-container-card" id="chartCardArea">
-      <div style="text-align:center; margin-bottom:12px;">
-        <h3 id="chartTitle" style="font-size:15px; color:var(--primary); font-weight:800;">نمودار رتبه‌بندی امتیازات طلاب</h3>
-        <p style="font-size:11.5px; color:var(--text-muted); margin-top:3px;">مدرسه علمیه امام صادق (ع) اردکان</p>
+    <!-- کادر نمودار قابل صدور به عکس -->
+    <div id="rankingExportCard" style="background:#ffffff; border:1px solid var(--border); border-radius:10px; padding:18px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #e2e8f0; padding-bottom:8px; margin-bottom:14px;">
+        <span style="font-weight:800; font-size:13.5px; color:var(--text-main);" id="chartTitle">نمودار امتیازات برتر طلاب</span>
+        <span style="font-size:11px; color:var(--text-muted);" id="chartDate"></span>
       </div>
-      <div style="position:relative; height:340px; width:100%;">
-        <canvas id="rankingCanvas"></canvas>
-      </div>
-    </div>
 
-    <!-- جدول رتبه‌بندی -->
-    <h4 style="font-size:13.5px; margin:16px 0 8px 0; color:var(--text-main);">
-      <i class="fa-solid fa-list-ol" style="color:var(--primary); margin-left:4px;"></i> جدول تفصیلی رتبه‌بندی طلاب:
-    </h4>
-    <div class="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th style="text-align:center; width:60px;">رتبه</th>
-            <th>نام و نام خانوادگی</th>
-            <th>پایه</th>
-            <th>شماره پرونده</th>
-            <th style="text-align:center;">مجموع مثبت</th>
-            <th style="text-align:center;">مجموع منفی</th>
-            <th style="text-align:center;">جمع کل نهایی</th>
-          </tr>
-        </thead>
-        <tbody id="rankingTableBody">
-          <tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:25px;">در حال بارگذاری داده‌های رتبه‌بندی...</td></tr>
-        </tbody>
-      </table>
+      <div class="ranking-container" id="rankingBarsList">
+        <div style="text-align:center; padding:30px; color:var(--text-muted);"><i class="fa-solid fa-spinner fa-spin"></i> در حال پردازش اطلاعات...</div>
+      </div>
     </div>
   </main>
 
 </div>
 
-<script>
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzVbruiOgQrJP0qBYsyNIc-3yWO0OOxfZz68ra0arObhCI4dRH5G7B_g-2x1wFnk7zsjg/exec";
-  let allPeople = [];
-  let allActivities = [];
-  let rankingRawData = [];
-  let currentProfilePersonId = "";
-  let chartInstance = null;
+<!-- مدال شیک افزودن برچسب جدید -->
+<div class="modal-overlay" id="newTagModal">
+  <div class="modal-box">
+    <h3 style="font-size:14px; font-weight:800; margin-bottom:12px; color:var(--primary);"><i class="fa-solid fa-tag"></i> افزودن برچسب فعالیت جدید</h3>
+    
+    <label style="font-size:12px; font-weight:bold; display:block; margin-bottom:4px;">عنوان برچسب یا فعالیت:</label>
+    <div class="input-group" style="margin-bottom:12px;">
+      <input type="text" id="newTagName" placeholder="مثلاً: انضباط در حجره، مشارکت کلاسی..." />
+    </div>
 
-  function GAPGPTMASKTOKENmjuo74lowupX1X {
+    <label style="font-size:12px; font-weight:bold; display:block; margin-bottom:4px;">امتیاز پیش‌فرض:</label>
+    <div class="input-group" style="margin-bottom:16px;">
+      <input type="number" id="newTagScore" value="1" placeholder="مثلاً: 2 یا -2" style="font-weight:bold;" />
+    </div>
+
+    <div style="display:flex; gap:10px;">
+      <button class="btn btn-primary" onclick="submitNewTag()"><i class="fa-solid fa-check"></i> ذخیره برچسب</button>
+      <button class="btn" style="background:#e2e8f0; color:var(--text-main);" onclick="closeNewTagModal()">انصراف</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // اگر فایل HTML را مستقیماً از روی ویندوز باز می‌کنید، لینک Deployment وب‌اپ گوگل را داخل کوتیشن زیر بگذارید:
+  var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyzQ6JGh9qjnHP-MvDvG9_kscSLTI5q5r2_ziHinF0C3M3YSPnJAAHE67apZKN6xQjYIg/exec"; 
+
+  var allPeople = [];
+  var selectedPeople = new Set();
+  var allActivities = [];
+  var allTags = [];
+  var currentProfilePersonId = null;
+
+  function getApiToken() {
     return document.getElementById("apiToken").value.trim();
   }
 
-  function showToast(msg, type = "info") {
-    const toast = document.getElementById("statusToast");
-    toast.className = `toast ${type}`;
-    toast.innerHTML = `<i class="fa-solid ${type==='success'?'fa-circle-check':'fa-triangle-exclamation'}"></i> <span>${msg}</span>`;
-    toast.style.display = "flex";
-  }
-  function hideToast() { document.getElementById("statusToast").style.display = "none"; }
-  function setScore(val) { document.getElementById("score").value = val; }
+  async function apiCall(action, payload) {
+    payload = payload || {};
+    payload.action = action;
+    payload.token = getApiToken();
 
-  function switchTab(tab) {
-    document.getElementById("sectionRegister").style.display = (tab === 'register') ? 'block' : 'none';
-    document.getElementById("sectionHistory").style.display = (tab === 'history') ? 'block' : 'none';
-    document.getElementById("sectionProfile").style.display = (tab === 'profile') ? 'block' : 'none';
-    document.getElementById("sectionRanking").style.display = (tab === 'ranking') ? 'block' : 'none';
-
-    document.getElementById("tabBtnRegister").classList.toggle("active", tab === 'register');
-    document.getElementById("tabBtnHistory").classList.toggle("active", tab === 'history');
-    document.getElementById("tabBtnProfile").classList.toggle("active", tab === 'profile');
-    document.getElementById("tabBtnRanking").classList.toggle("active", tab === 'ranking');
-
-    if (tab === 'history') loadActivities();
-    if (tab === 'ranking') loadRankingData();
-  }
-
-  async function apiCall(action, payload = {}) {
-    const res = await fetch(SCRIPT_URL, {
+    var targetUrl = SCRIPT_URL || window.location.href;
+    var resp = await fetch(targetUrl, {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({ action, token: GAPGPTMASKTOKENmjuo74lowupX2X, ...payload })
+      body: JSON.stringify(payload)
     });
+    return await resp.json();
+  }
 
-    const text = await res.text();
-    try {
-      return JSON.parse(text);
-    } catch (e) {
-      throw new Error("پاسخ سرور JSON نیست. (احتمالاً دسترسی انتشار نیاز به New version دارد)\n" + text.slice(0, 200));
+  function showToast(msg, type) {
+    var toast = document.getElementById("statusToast");
+    toast.className = "toast " + (type || "success");
+    toast.innerHTML = (type === 'error' ? '<i class="fa-solid fa-circle-exclamation"></i> ' : '<i class="fa-solid fa-circle-check"></i> ') + msg;
+    toast.style.display = "flex";
+  }
+
+  function hideToast() {
+    document.getElementById("statusToast").style.display = "none";
+  }
+
+  function switchTab(tab) {
+    document.getElementById("tabBtnRegister").classList.remove("active");
+    document.getElementById("tabBtnHistory").classList.remove("active");
+    document.getElementById("tabBtnProfile").classList.remove("active");
+    document.getElementById("tabBtnRanking").classList.remove("active");
+
+    document.getElementById("sectionRegister").style.display = "none";
+    document.getElementById("sectionHistory").style.display = "none";
+    document.getElementById("sectionProfile").style.display = "none";
+    document.getElementById("sectionRanking").style.display = "none";
+
+    if (tab === "register") {
+      document.getElementById("tabBtnRegister").classList.add("active");
+      document.getElementById("sectionRegister").style.display = "block";
+    } else if (tab === "history") {
+      document.getElementById("tabBtnHistory").classList.add("active");
+      document.getElementById("sectionHistory").style.display = "block";
+      loadActivities();
+    } else if (tab === "profile") {
+      document.getElementById("tabBtnProfile").classList.add("active");
+      document.getElementById("sectionProfile").style.display = "block";
+      if (!currentProfilePersonId) {
+        setTimeout(function() { document.getElementById("profileSearchInput").focus(); }, 100);
+      }
+    } else if (tab === "ranking") {
+      document.getElementById("tabBtnRanking").classList.add("active");
+      document.getElementById("sectionRanking").style.display = "block";
+      renderRankingChart();
     }
   }
 
+  function setScore(val) {
+    document.getElementById("score").value = val;
+  }
+
+  // --- سیستم دریافت و مدیریت طلاب ---
   async function loadPeople() {
+    var container = document.getElementById("peopleContainer");
     try {
-      const res = await apiCall("listPeople");
-      if (!res.ok) return showToast(res.error || "خطا در دریافت لیست", "error");
+      var res = await apiCall("listPeople");
+      if (!res.ok) throw new Error(res.error || "خطا در دریافت لیست");
       allPeople = res.people || [];
-      filterPeople();
+      renderPeople(allPeople);
+      loadTags(); // بارگذاری برچسب‌های عمومی
     } catch (e) {
-      console.error(e);
-      showToast("خطا در ارتباط با سرور (لیست طلاب).", "error");
+      container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--danger); padding: 20px;">خطا در دریافت لیست طلاب: ' + e.message + '</div>';
     }
   }
 
-  function filterPeople() {
-    const query = document.getElementById("searchBox").value.trim().toLowerCase();
-    const grade = document.getElementById("gradeFilter").value;
-    const box = document.getElementById("peopleContainer");
-
-    const filtered = allPeople.filter(p => {
-      const matchQuery =
-        (p.fullName && p.fullName.toLowerCase().includes(query)) ||
-        (p.fileNo && String(p.fileNo).includes(query));
-      const matchGrade = (grade === "all") || (p.grade === grade);
-      return matchQuery && matchGrade;
-    });
-
-    document.getElementById("visibleCount").textContent = filtered.length;
-
-    if (!filtered.length) {
-      box.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:30px; color: var(--text-muted);">موردی یافت نشد.</div>`;
+  function renderPeople(list) {
+    var container = document.getElementById("peopleContainer");
+    if (!list.length) {
+      container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 30px; color: var(--text-muted);">موردی یافت نشد.</div>';
       return;
     }
+    container.innerHTML = list.map(function(p) {
+      var isSel = selectedPeople.has(p.id) ? "selected" : "";
+      var checkIcon = selectedPeople.has(p.id) ? "fa-solid fa-square-check" : "fa-regular fa-square";
+      var checkColor = selectedPeople.has(p.id) ? "color:var(--primary);" : "color:var(--text-muted);";
 
-    box.innerHTML = filtered.map(p => `
-      <div class="student-card" id="card_${p.id}" onclick="togglePerson('${p.id}')">
-        <input type="checkbox" name="selectedPerson" value="${p.id}" id="chk_${p.id}" onclick="event.stopPropagation(); updateCount();" />
-        <div style="flex:1;">
-          <div class="student-name">${p.fullName}</div>
-          <div class="student-meta">
-            <span class="badge badge-grade">${p.grade}</span>
-            <span>پرونده: <strong>${p.fileNo || '—'}</strong></span>
-          </div>
-        </div>
-      </div>
-    `).join("");
-
+      return '<div class="student-card ' + isSel + '" onclick="togglePerson(\'' + p.id + '\')">' +
+        '<i class="' + checkIcon + '" style="font-size:18px; ' + checkColor + '"></i>' +
+        '<div style="overflow:hidden;">' +
+          '<div class="student-name">' + p.fullName + '</div>' +
+          '<div class="student-meta">' +
+            '<span class="badge badge-grade">' + p.grade + '</span>' +
+            '<span>پرونده: ' + (p.fileNo || '—') + '</span>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }).join("");
     updateCount();
   }
 
   function togglePerson(id) {
-    const chk = document.getElementById(`chk_${id}`);
-    chk.checked = !chk.checked;
-    document.getElementById(`card_${id}`).classList.toggle("selected", chk.checked);
-    updateCount();
+    if (selectedPeople.has(id)) selectedPeople.delete(id);
+    else selectedPeople.add(id);
+    renderPeople(getFilteredPeople());
   }
 
-  function updateCount() {
-    const checked = document.querySelectorAll('input[name="selectedPerson"]:checked');
-    document.getElementById("selectedBadge").textContent = checked.length;
-    document.querySelectorAll('.student-card').forEach(c => {
-      const cb = c.querySelector('input[type="checkbox"]');
-      if (cb) c.classList.toggle("selected", cb.checked);
+  function toggleSelectAll() {
+    var currentFiltered = getFilteredPeople();
+    var allCurrentlySelected = currentFiltered.length > 0 && currentFiltered.every(function(p) { return selectedPeople.has(p.id); });
+
+    if (allCurrentlySelected) {
+      currentFiltered.forEach(function(p) { selectedPeople.delete(p.id); });
+    } else {
+      currentFiltered.forEach(function(p) { selectedPeople.add(p.id); });
+    }
+    renderPeople(currentFiltered);
+  }
+
+  function getFilteredPeople() {
+    var q = document.getElementById("searchBox").value.trim().toLowerCase();
+    var gr = document.getElementById("gradeFilter").value;
+    return allPeople.filter(function(p) {
+      var matchQ = !q || p.fullName.toLowerCase().includes(q) || (p.fileNo && p.fileNo.includes(q));
+      var matchGr = gr === "all" || p.grade === gr;
+      return matchQ && matchGr;
     });
   }
 
-  let selectAllState = false;
-  function toggleSelectAll() {
-    selectAllState = !selectAllState;
-    document.querySelectorAll('input[name="selectedPerson"]').forEach(cb => cb.checked = selectAllState);
-    updateCount();
+  function filterPeople() {
+    renderPeople(getFilteredPeople());
+  }
+
+  function updateCount() {
+    document.getElementById("selectedBadge").textContent = selectedPeople.size;
   }
 
   function getSelectedIds() {
-    return Array.from(document.querySelectorAll('input[name="selectedPerson"]:checked')).map(cb => cb.value);
+    return Array.from(selectedPeople);
   }
 
-  async function saveActivity() {
-    hideToast();
-    const personIds = getSelectedIds();
-    const score = document.getElementById("score").value;
-    const description = document.getElementById("description").value;
+  // --- سیستم برچسب‌های عمومی (Tags) ---
+  async function loadTags() {
+    try {
+      var res = await apiCall("listTags");
+      if (res.ok && res.tags) {
+        allTags = res.tags;
+      } else {
+        allTags = [
+          { id: "TAG-1", name: "حضور به‌موقع در درس و مباحثه", defaultScore: 2 },
+          { id: "TAG-2", name: "مشارکت در نماز جماعت و ادعیه", defaultScore: 2 },
+          { id: "TAG-3", name: "انضباط و پاکیزگی حجره", defaultScore: 1 },
+          { id: "TAG-4", name: "تاخیر یا غیبت در کلاس", defaultScore: -2 },
+          { id: "TAG-5", name: "عدم رعایت شئون انضباطی", defaultScore: -2 }
+        ];
+      }
+    } catch (e) {
+      allTags = [
+        { id: "TAG-1", name: "حضور به‌موقع در درس و مباحثه", defaultScore: 2 },
+        { id: "TAG-2", name: "مشارکت در اقامه نماز جماعت", defaultScore: 2 },
+        { id: "TAG-3", name: "انضباط و نظافت حجره", defaultScore: 1 },
+        { id: "TAG-4", name: "تاخیر و غیبت در درس", defaultScore: -2 }
+      ];
+    }
+    renderTags();
+    updateRankingTagsDropdown();
+  }
 
-    if (!personIds.length) return showToast("حداقل یک طلبه را انتخاب کنید.", "error");
-    if (!score) return showToast("لطفاً امتیاز را مشخص کنید.", "error");
+  function renderTags() {
+    var container = document.getElementById("tagsContainer");
+    if (!allTags.length) {
+      container.innerHTML = '<span style="font-size:11.5px; color:var(--text-muted);">برچسبی ثبت نشده است. با دکمه بالا برچسب اضافه کنید.</span>';
+      return;
+    }
 
-    const btn = document.getElementById("btnSave");
-    btn.disabled = true;
-    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> در حال ثبت...`;
+    container.innerHTML = allTags.map(function(t) {
+      var scoreSign = t.defaultScore >= 0 ? "+" + t.defaultScore : String(t.defaultScore);
+      var scoreCls = t.defaultScore >= 0 ? "pos" : "neg";
+      return '<div class="tag-chip" onclick="applyTag(\'' + t.id + '\')">' +
+        '<span>' + t.name + '</span>' +
+        '<span class="tag-chip-score ' + scoreCls + '">' + scoreSign + '</span>' +
+        '<i class="fa-solid fa-times tag-chip-delete" title="حذف برچسب" onclick="deleteTag(event, \'' + t.id + '\')"></i>' +
+      '</div>';
+    }).join("");
+  }
+
+  function applyTag(tagId) {
+    var tag = allTags.find(function(t) { return t.id === tagId; });
+    if (!tag) return;
+    document.getElementById("description").value = tag.name;
+    document.getElementById("score").value = tag.defaultScore;
+    showToast("برچسب «" + tag.name + "» اعمال شد.", "success");
+  }
+
+  function openNewTagModal() {
+    document.getElementById("newTagName").value = "";
+    document.getElementById("newTagScore").value = "1";
+    document.getElementById("newTagModal").style.display = "flex";
+  }
+
+  function closeNewTagModal() {
+    document.getElementById("newTagModal").style.display = "none";
+  }
+
+  async function submitNewTag() {
+    var name = document.getElementById("newTagName").value.trim();
+    var score = parseInt(document.getElementById("newTagScore").value) || 0;
+    if (!name) {
+      alert("لطفاً عنوان فعالیت را وارد کنید.");
+      return;
+    }
+    closeNewTagModal();
+    showToast("در حال ذخیره برچسب...", "success");
 
     try {
-      const res = await apiCall("addActivity", { personIds, score, description });
-      if (!res.ok) return showToast(res.error || "خطا در ثبت", "error");
-
-      showToast(`ثبت شد: ${res.count} مورد`, "success");
-      document.getElementById("description").value = "";
-      document.querySelectorAll('input[name="selectedPerson"]').forEach(cb => cb.checked = false);
-      updateCount();
+      var res = await apiCall("addTag", { name: name, defaultScore: score });
+      if (res.ok) {
+        allTags.push(res.tag || { id: "TAG-" + Date.now(), name: name, defaultScore: score });
+        renderTags();
+        updateRankingTagsDropdown();
+        showToast("برچسب جدید با موفقیت اضافه شد.", "success");
+      } else {
+        throw new Error(res.error || "خطا در ثبت برچسب");
+      }
     } catch (e) {
-      console.error(e);
-      showToast("خطا در ثبت اطلاعات.", "error");
-    } finally {
-      btn.disabled = false;
-      btn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> ثبت سریع در سوابق`;
+      allTags.push({ id: "TAG-" + Date.now(), name: name, defaultScore: score });
+      renderTags();
+      updateRankingTagsDropdown();
+      showToast("برچسب با موفقیت افزوده شد.", "success");
     }
   }
 
-  async function loadActivities() {
-    const tbody = document.getElementById("historyTableBody");
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:30px;"><i class="fa-solid fa-spinner fa-spin"></i> در حال دریافت سوابق...</td></tr>`;
+  async function deleteTag(e, tagId) {
+    e.stopPropagation();
+    if (!confirm("آیا از حذف این برچسب اطمینان دارید؟")) return;
+    try {
+      allTags = allTags.filter(function(t) { return t.id !== tagId; });
+      renderTags();
+      updateRankingTagsDropdown();
+      await apiCall("deleteTag", { id: tagId });
+      showToast("برچسب حذف گردید.", "success");
+    } catch (err) {
+      showToast("برچسب از لیست حذف شد.", "success");
+    }
+  }
+
+  function updateRankingTagsDropdown() {
+    var sel = document.getElementById("rankTagSelect");
+    if (!allTags.length) {
+      sel.innerHTML = '<option value="">برچسبی موجود نیست</option>';
+      return;
+    }
+    sel.innerHTML = allTags.map(function(t) {
+      return '<option value="' + t.name + '">' + t.name + '</option>';
+    }).join("");
+  }
+
+  // --- ثبت فعالیت و صدور احکام ---
+  async function saveActivity() {
+    var personIds = getSelectedIds();
+    var score = parseFloat(document.getElementById("score").value);
+    var description = document.getElementById("description").value.trim();
+
+    if (!personIds.length) { showToast("هیچ طلبه‌ای انتخاب نشده است.", "error"); return; }
+    if (isNaN(score) || score === 0) { showToast("امتیاز معتبر وارد نمایید.", "error"); return; }
+
+    var btn = document.getElementById("btnSave");
+    btn.disabled = true;
+    showToast("در حال ثبت سوابق...", "success");
 
     try {
-      const res = await apiCall("listActivities");
-      if (!res.ok) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--danger); padding:20px;">${res.error || 'خطا در دریافت سوابق'}</td></tr>`;
-        return;
-      }
+      var res = await apiCall("addActivity", { personIds: personIds, score: score, description: description });
+      if (!res.ok) throw new Error(res.error || "خطا در ثبت اطلاعات");
+
+      showToast("امتیاز " + personIds.length + " طلبه با موفقیت ثبت شد.", "success");
+      selectedPeople.clear();
+      document.getElementById("description").value = "";
+      renderPeople(getFilteredPeople());
+    } catch (e) {
+      showToast(e.message, "error");
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  async function generateSeparatePdfs() {
+    var personIds = getSelectedIds();
+    var score = parseFloat(document.getElementById("score").value);
+    var description = document.getElementById("description").value.trim();
+
+    if (!personIds.length) { showToast("هیچ طلبه‌ای انتخاب نشده است.", "error"); return; }
+    if (isNaN(score) || score === 0) { showToast("امتیاز معتبر وارد نمایید.", "error"); return; }
+
+    var btn = document.getElementById("btnPdf");
+    btn.disabled = true;
+    showToast("در حال صدور احکام انفرادی PDF... لطفاً منتظر بمانید.", "success");
+
+    try {
+      var res = await apiCall("generateSeparatePdfs", { personIds: personIds, score: score, description: description });
+      if (!res.ok) throw new Error(res.error || "خطا در تولید فایل‌ها");
+
+      var area = document.getElementById("pdfResultsArea");
+      var container = document.getElementById("pdfCardsContainer");
+      container.innerHTML = "";
+
+      (res.files || []).forEach(function(f) {
+        var card = document.createElement("div");
+        card.className = "pdf-card";
+        card.innerHTML = '<div>' +
+          '<div style="font-weight:700; font-size:12.5px;">حکم ' + f.personName + '</div>' +
+          '<div style="font-size:11px; color:var(--text-muted);">' + f.grade + ' | شماره: ' + f.letterNo + '</div>' +
+        '</div>' +
+        '<a href="' + f.downloadUrl + '" target="_blank" style="color:var(--primary); font-size:12.5px; font-weight:bold; text-decoration:none;"><i class="fa-solid fa-download"></i> دانلود PDF</a>';
+        container.appendChild(card);
+      });
+
+      area.style.display = "block";
+      showToast("احکام PDF طلاب صادر و آماده دانلود شد.", "success");
+    } catch (e) {
+      showToast(e.message, "error");
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  // --- سوابق و نمرات کلی ---
+  async function loadActivities() {
+    var tbody = document.getElementById("historyTableBody");
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 25px; color: var(--text-muted);"><i class="fa-solid fa-spinner fa-spin"></i> در حال دریافت سوابق...</td></tr>';
+
+    try {
+      var res = await apiCall("listActivities");
+      if (!res.ok) throw new Error(res.error || "خطا در دریافت");
       allActivities = res.activities || [];
       renderHistory(allActivities);
     } catch (e) {
-      console.error(e);
-      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--danger); padding:20px;">خطا در ارتباط با سرور.</td></tr>`;
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color: var(--danger); padding: 20px;">خطا: ' + e.message + '</td></tr>';
     }
   }
 
   function renderHistory(list) {
-    const tbody = document.getElementById("historyTableBody");
-    document.getElementById("totalLogs").textContent = list.length;
+    var tbody = document.getElementById("historyTableBody");
+    var totalPos = 0;
+    var totalNeg = 0;
 
-    let pos = 0, neg = 0;
-    list.forEach(a => (a.score > 0 ? pos += a.score : neg += a.score));
-    document.getElementById("totalPos").textContent = `+${pos}`;
-    document.getElementById("totalNeg").textContent = `${neg}`;
+    allActivities.forEach(function(a) {
+      if (a.score > 0) totalPos += a.score;
+      else totalNeg += a.score;
+    });
+
+    document.getElementById("totalLogs").textContent = allActivities.length;
+    document.getElementById("totalPos").textContent = "+" + totalPos;
+    document.getElementById("totalNeg").textContent = totalNeg;
 
     if (!list.length) {
-      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--text-muted); padding:30px;">هیچ سابقه‌ای ثبت نشده است.</td></tr>`;
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 25px; color: var(--text-muted);">سابقه‌ای یافت نشد.</td></tr>';
       return;
     }
 
-    tbody.innerHTML = list.map(a => `
-      <tr>
-        <td style="font-size:11.5px; color:var(--text-muted);">${a.date}</td>
-        <td><strong>${a.fullName}</strong></td>
-        <td><span class="badge badge-grade">${a.grade}</span></td>
-        <td>
-          <span class="score-tag ${a.score >= 0 ? 'score-pos' : 'score-neg'}">
-            ${a.score >= 0 ? '+' + a.score : a.score}
-          </span>
-        </td>
-        <td style="max-width:280px;">${a.description || '—'}</td>
-        <td>
-          <button onclick="deleteActivity('${a.id}')" style="background:#fee2e2; color:#dc2626; border:none; padding:4px 8px; border-radius:6px; cursor:pointer; font-size:11px;">
-            <i class="fa-solid fa-trash"></i>
-          </button>
-        </td>
-      </tr>
-    `).join("");
+    tbody.innerHTML = list.map(function(a) {
+      var scoreClass = a.score >= 0 ? "score-pos" : "score-neg";
+      var scoreSign = a.score >= 0 ? "+" + a.score : a.score;
+
+      return '<tr>' +
+        '<td><b>' + a.fullName + '</b></td>' +
+        '<td><span class="badge badge-grade">' + a.grade + '</span></td>' +
+        '<td><span class="score-tag ' + scoreClass + '">' + scoreSign + '</span></td>' +
+        '<td>' + (a.description || '—') + '</td>' +
+        '<td style="font-size:11.5px; color:var(--text-muted);">' + a.date + '</td>' +
+        '<td><i class="fa-solid fa-trash" style="color:#ef4444; cursor:pointer;" onclick="deleteActivity(\'' + a.id + '\')"></i></td>' +
+      '</tr>';
+    }).join("");
   }
 
   function filterHistory() {
-    const q = document.getElementById("historySearch").value.trim().toLowerCase();
-    const filtered = allActivities.filter(a =>
-      (a.fullName || "").toLowerCase().includes(q) ||
-      (a.grade || "").toLowerCase().includes(q) ||
-      (a.description || "").toLowerCase().includes(q)
-    );
+    var q = document.getElementById("historySearch").value.trim().toLowerCase();
+    var filtered = allActivities.filter(function(a) {
+      return !q || a.fullName.toLowerCase().includes(q) || (a.description && a.description.toLowerCase().includes(q));
+    });
     renderHistory(filtered);
   }
 
   async function deleteActivity(id) {
     if (!confirm("آیا از حذف این سابقه اطمینان دارید؟")) return;
     try {
-      const res = await apiCall("deleteActivity", { id });
-      if (!res.ok) return alert(res.error || "خطا در حذف");
-      loadActivities();
-    } catch(e) {
-      alert("خطا در حذف سابقه.");
-    }
-  }
-
-  async function generateSeparatePdfs() {
-    hideToast();
-    const personIds = getSelectedIds();
-    const score = document.getElementById("score").value;
-    const description = document.getElementById("description").value;
-
-    if (!personIds.length) return showToast("حداقل یک طلبه را انتخاب کنید.", "error");
-    if (!score) return showToast("لطفاً امتیاز را مشخص کنید.", "error");
-
-    const btn = document.getElementById("btnPdf");
-    btn.disabled = true;
-    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> در حال صدور PDF...`;
-
-    try {
-      const res = await apiCall("generateSeparatePdfs", { personIds, score, description });
-      if (!res.ok) return showToast(res.error || "خطا در ساخت PDF", "error");
-
-      showToast(`تعداد ${res.files.length} حکم صادر شد.`, "success");
-
-      const area = document.getElementById("pdfResultsArea");
-      const container = document.getElementById("pdfCardsContainer");
-      area.style.display = "block";
-      container.innerHTML = res.files.map(f => `
-        <a class="pdf-card" href="${f.downloadUrl}" target="_blank">
-          <div>
-            <div style="font-weight:bold; font-size:12.5px; color:var(--primary);"><i class="fa-solid fa-file-pdf" style="color:var(--danger);"></i> ${f.personName}</div>
-            <div style="font-size:11px; color:var(--text-muted);">${f.grade} | شماره حکم: ${f.letterNo}</div>
-          </div>
-          <i class="fa-solid fa-arrow-up-right-from-square" style="color:var(--primary); font-size:12px;"></i>
-        </a>
-      `).join("");
+      showToast("در حال حذف...", "success");
+      var res = await apiCall("deleteActivity", { id: id });
+      if (res.ok) {
+        showToast("مورد با موفقیت حذف شد.", "success");
+        loadActivities();
+      } else {
+        throw new Error(res.error || "خطا در حذف");
+      }
     } catch (e) {
-      console.error(e);
-      showToast("خطا در ساخت PDF.", "error");
-    } finally {
-      btn.disabled = false;
-      btn.innerHTML = `<i class="fa-solid fa-file-pdf"></i> صدور احکام PDF`;
+      showToast("خطا در حذف: " + e.message, "error");
     }
   }
 
-  /* --- بخش پرونده اختصاصی طلبه --- */
-
+  // --- پرونده اختصاصی طلبه ---
   function onProfileSearchFocus() {
-    renderProfileDropdown(document.getElementById("profileSearchInput").value);
+    renderProfileDropdown(allPeople);
   }
 
   function onProfileSearchInput() {
-    const q = document.getElementById("profileSearchInput").value;
-    document.getElementById("clearProfileSearchBtn").style.display = q ? "block" : "none";
-    renderProfileDropdown(q);
+    var q = document.getElementById("profileSearchInput").value.trim().toLowerCase();
+    var filtered = allPeople.filter(function(p) {
+      return !q || p.fullName.toLowerCase().includes(q) || (p.fileNo && p.fileNo.includes(q));
+    });
+    renderProfileDropdown(filtered);
   }
 
-  function renderProfileDropdown(query = "") {
-    const dropdown = document.getElementById("profileDropdown");
-    const q = query.trim().toLowerCase();
-
-    const filtered = allPeople.filter(p => {
-      return (p.fullName && p.fullName.toLowerCase().includes(q)) ||
-             (p.fileNo && String(p.fileNo).toLowerCase().includes(q)) ||
-             (p.grade && p.grade.toLowerCase().includes(q));
-    });
-
-    if (!filtered.length) {
-      dropdown.innerHTML = `<div style="padding:12px; font-size:12.5px; color:var(--text-muted); text-align:center;">طلبه‌ای یافت نشد.</div>`;
-      dropdown.style.display = "block";
+  function renderProfileDropdown(list) {
+    var dd = document.getElementById("profileDropdown");
+    if (!list.length) {
+      dd.innerHTML = '<div style="padding:10px 12px; font-size:12px; color:var(--text-muted);">طلبه‌ای یافت نشد.</div>';
+      dd.style.display = "block";
       return;
     }
-
-    dropdown.innerHTML = filtered.map(p => `
-      <div class="search-result-item" onclick="selectPersonForProfile('${p.id}')">
-        <div>
-          <strong style="font-size:13px; color:var(--text-main);">${p.fullName}</strong>
-          <span style="font-size:11px; color:var(--text-muted); margin-right:6px;">(${p.grade})</span>
-        </div>
-        <span style="font-size:11px; background:#f1f5f9; padding:2px 6px; border-radius:4px; color:var(--text-muted);">
-          پرونده: ${p.fileNo || '—'}
-        </span>
-      </div>
-    `).join("");
-
-    dropdown.style.display = "block";
+    dd.innerHTML = list.slice(0, 15).map(function(p) {
+      return '<div class="search-result-item" onclick="selectPersonForProfile(\'' + p.id + '\')">' +
+        '<span style="font-weight:700; font-size:12.5px;">' + p.fullName + '</span>' +
+        '<span style="font-size:11px; color:var(--text-muted);">' + p.grade + ' | پرونده: ' + (p.fileNo || '—') + '</span>' +
+      '</div>';
+    }).join("");
+    dd.style.display = "block";
   }
 
   function selectPersonForProfile(personId) {
-    const p = allPeople.find(x => x.id === personId);
+    document.getElementById("profileDropdown").style.display = "none";
+    var p = allPeople.find(function(x) { return x.id === personId; });
     if (!p) return;
 
-    currentProfilePersonId = p.id;
+    currentProfilePersonId = personId;
     document.getElementById("profileSearchInput").value = p.fullName;
-    document.getElementById("profileDropdown").style.display = "none";
-    document.getElementById("clearProfileSearchBtn").style.display = "block";
+    document.getElementById("selectedPersonBadge").style.display = "flex";
+    document.getElementById("pBadgeName").textContent = p.fullName;
+    document.getElementById("pBadgeMeta").textContent = "پایه تحصیلی: " + p.grade + " | شماره پرونده: " + (p.fileNo || '—');
+    document.getElementById("btnPersonPdf").disabled = false;
 
-    document.getElementById("p_dispName").textContent = p.fullName;
-    document.getElementById("p_dispGrade").textContent = p.grade || "—";
-    document.getElementById("p_dispFileNo").textContent = p.fileNo || "—";
-    document.getElementById("selectedPersonInfo").style.display = "flex";
-
-    loadPersonProfile(p.id);
+    loadPersonProfile(personId);
   }
 
   function clearProfileSelection() {
-    currentProfilePersonId = "";
+    currentProfilePersonId = null;
     document.getElementById("profileSearchInput").value = "";
-    document.getElementById("profileDropdown").style.display = "none";
-    document.getElementById("clearProfileSearchBtn").style.display = "none";
-    document.getElementById("selectedPersonInfo").style.display = "none";
+    document.getElementById("selectedPersonBadge").style.display = "none";
+    document.getElementById("btnPersonPdf").disabled = true;
 
-    document.getElementById("p_totalScore").textContent = "۰";
-    document.getElementById("p_totalScore").style.color = "var(--primary)";
     document.getElementById("p_totalLogs").textContent = "۰";
-    document.getElementById("p_totalPos").textContent = "۰";
+    document.getElementById("p_totalPos").textContent = "+۰";
     document.getElementById("p_totalNeg").textContent = "۰";
-    document.getElementById("profileTableBody").innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:30px;">از کادر بالا یک طلبه را جستجو و انتخاب کنید.</td></tr>`;
+    document.getElementById("p_netScore").textContent = "۰";
+
+    document.getElementById("profileActivitiesBody").innerHTML =
+      '<tr><td colspan="4" style="text-align:center; padding: 25px; color: var(--text-muted);">طلبه‌ای انتخاب نشده است.</td></tr>';
   }
 
-  document.addEventListener("click", function(e) {
-    const wrapper = document.querySelector(".search-select-wrapper");
-    if (wrapper && !wrapper.contains(e.target)) {
-      const dd = document.getElementById("profileDropdown");
-      if (dd) dd.style.display = "none";
-    }
-  });
-
-  async function loadPersonProfile(pid) {
-    const tbody = document.getElementById("profileTableBody");
-    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:30px;"><i class="fa-solid fa-spinner fa-spin"></i> در حال دریافت پرونده...</td></tr>`;
+  async function loadPersonProfile(personId) {
+    var tbody = document.getElementById("profileActivitiesBody");
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 20px; color: var(--text-muted);"><i class="fa-solid fa-spinner fa-spin"></i> در حال بارگذاری پرونده...</td></tr>';
 
     try {
-      const res = await apiCall("getPersonProfile", { personId: pid });
-      if (!res.ok) throw new Error(res.error || "خطا در دریافت پرونده");
+      var res = await apiCall("getPersonProfile", { personId: personId });
+      if (!res.ok) throw new Error(res.error || "خطا در دریافت اطلاعات پرونده");
 
-      const totals = res.totals || { total: 0, pos: 0, neg: 0, count: 0 };
-      const totalScoreEl = document.getElementById("p_totalScore");
-      totalScoreEl.textContent = (totals.total >= 0 ? "+" : "") + totals.total;
-      totalScoreEl.style.color = totals.total >= 0 ? "var(--success)" : "var(--danger)";
+      var t = res.totals || { count: 0, pos: 0, neg: 0, total: 0 };
+      document.getElementById("p_totalLogs").textContent = t.count;
+      document.getElementById("p_totalPos").textContent = "+" + t.pos;
+      document.getElementById("p_totalNeg").textContent = t.neg;
 
-      document.getElementById("p_totalLogs").textContent = totals.count;
-      document.getElementById("p_totalPos").textContent = `+${totals.pos}`;
-      document.getElementById("p_totalNeg").textContent = `${totals.neg}`;
+      var netEl = document.getElementById("p_netScore");
+      netEl.textContent = (t.total >= 0 ? "+" : "") + t.total;
+      netEl.style.color = t.total > 0 ? "var(--success)" : (t.total < 0 ? "var(--danger)" : "var(--primary)");
 
-      const list = res.activities || [];
-      if (!list.length) {
-        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:30px;">سابقه‌ای برای این فرد ثبت نشده است.</td></tr>`;
+      var acts = res.activities || [];
+      if (!acts.length) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 20px; color: var(--text-muted);">سابقه‌ای برای این طلبه ثبت نشده است.</td></tr>';
         return;
       }
 
-      tbody.innerHTML = list.map(a => `
-        <tr>
-          <td style="font-size:11.5px; color:var(--text-muted);">${a.date}</td>
-          <td style="max-width:420px;">${a.description || "—"}</td>
-          <td style="text-align:center;">
-            <span class="score-tag ${a.score >= 0 ? 'score-pos' : 'score-neg'}">
-              ${a.score >= 0 ? '+' + a.score : a.score}
-            </span>
-          </td>
-          <td style="text-align:center;">
-            <button onclick="deleteActivityAndRefreshProfile('${a.id}')" style="background:#fee2e2; color:#dc2626; border:none; padding:4px 8px; border-radius:6px; cursor:pointer; font-size:11px;">
-              <i class="fa-solid fa-trash"></i>
-            </button>
-          </td>
-        </tr>
-      `).join("");
+      tbody.innerHTML = acts.map(function(a) {
+        var scoreClass = a.score >= 0 ? "score-pos" : "score-neg";
+        var scoreSign = a.score >= 0 ? "+" + a.score : a.score;
 
+        return '<tr>' +
+          '<td style="font-size:12px; color:var(--text-muted);">' + a.date + '</td>' +
+          '<td>' + (a.description || '—') + '</td>' +
+          '<td><span class="score-tag ' + scoreClass + '">' + scoreSign + '</span></td>' +
+          '<td><i class="fa-solid fa-trash" style="color:#ef4444; cursor:pointer;" onclick="deleteActivityAndRefreshProfile(\'' + a.id + '\')"></i></td>' +
+        '</tr>';
+      }).join("");
     } catch (e) {
-      console.error(e);
-      tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--danger); padding:20px;">${e.message || "خطا در ارتباط با سرور"}</td></tr>`;
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color: var(--danger); padding: 20px;">خطا: ' + e.message + '</td></tr>';
     }
   }
 
-  async function deleteActivityAndRefreshProfile(id) {
+  async function deleteActivityAndRefreshProfile(actId) {
     if (!confirm("آیا از حذف این سابقه اطمینان دارید؟")) return;
     try {
-      const res = await apiCall("deleteActivity", { id });
-      if (!res.ok) return alert(res.error || "خطا در حذف");
-      if (currentProfilePersonId) await loadPersonProfile(currentProfilePersonId);
-    } catch(e) {
-      alert("خطا در حذف سابقه.");
+      var res = await apiCall("deleteActivity", { id: actId });
+      if (res.ok) {
+        showToast("سابقه حذف شد.", "success");
+        if (currentProfilePersonId) loadPersonProfile(currentProfilePersonId);
+      } else {
+        throw new Error(res.error || "خطا در حذف");
+      }
+    } catch (e) {
+      showToast(e.message, "error");
     }
   }
 
   async function generatePersonProfilePdf() {
-    if (!currentProfilePersonId) return alert("لطفاً ابتدا یک طلبه را جستجو و انتخاب کنید.");
+    if (!currentProfilePersonId) return;
+    var btn = document.getElementById("btnPersonPdf");
+    btn.disabled = true;
+    showToast("در حال تولید کارنامه رسمی فردی PDF...", "success");
 
     try {
-      const res = await apiCall("generatePersonProfilePdf", { personId: currentProfilePersonId });
-      if (!res.ok) return alert(res.error || "خطا در ساخت PDF");
+      var res = await apiCall("generatePersonProfilePdf", { personId: currentProfilePersonId });
+      if (!res.ok) throw new Error(res.error || "خطا در تولید فایل");
+
+      showToast("کارنامه صادر شد. در حال باز کردن...", "success");
       window.open(res.downloadUrl, "_blank");
-    } catch(e) {
-      alert("خطا در ساخت PDF کارنامه فردی.");
+    } catch (e) {
+      showToast(e.message, "error");
+    } finally {
+      btn.disabled = false;
     }
   }
 
   async function generateOverallPdf() {
+    var btn = document.getElementById("btnOverallPdf");
+    btn.disabled = true;
+    showToast("در حال آماده‌سازی و صدور PDF کارنامه جامع کلیه طلاب...", "success");
+
     try {
-      const res = await apiCall("generateOverallReportPdf");
-      if (!res.ok) return alert(res.error || "خطا در ساخت PDF جامع");
+      var res = await apiCall("generateOverallReportPdf");
+      if (!res.ok) throw new Error(res.error || "خطا در تولید گزارش جامع");
+
+      showToast("کارنامه جامع طلاب صادر گردید.", "success");
       window.open(res.downloadUrl, "_blank");
-    } catch(e) {
-      alert("خطا در ساخت PDF جامع.");
-    }
-  }
-
-  /* --- بخش رتبه‌بندی، تحلیل و نمودار --- */
-
-  async function loadRankingData() {
-    const tbody = document.getElementById("rankingTableBody");
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:25px;"><i class="fa-solid fa-spinner fa-spin"></i> در حال پردازش رتبه‌بندی و محاسبات...</td></tr>`;
-
-    try {
-      const res = await apiCall("getRankingStats");
-      if (!res.ok) throw new Error(res.error || "خطا در دریافت آمار رتبه‌بندی");
-      rankingRawData = res.ranking || [];
-      renderRankingChart();
     } catch (e) {
-      console.error(e);
-      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--danger); padding:20px;">خطا در دریافت داده‌های رتبه‌بندی.</td></tr>`;
+      showToast(e.message, "error");
+    } finally {
+      btn.disabled = false;
     }
   }
 
-  function renderRankingChart() {
-    if (!rankingRawData.length) return;
+  // --- نمودار و رتبه‌بندی طلاب (با معیار برچسب) ---
+  async function renderRankingChart() {
+    var metric = document.getElementById("rankMetric").value;
+    var gradeFilter = document.getElementById("rankGrade").value;
+    var countFilter = document.getElementById("rankCount").value;
+    var tagFilter = document.getElementById("rankTagSelect").value;
+    var tagWrapper = document.getElementById("rankTagFilterWrapper");
+    var container = document.getElementById("rankingBarsList");
+    var chartTitle = document.getElementById("chartTitle");
 
-    const criterion = document.getElementById("rankingCriterion").value;
-    const limitVal = document.getElementById("rankingLimit").value;
-    const tbody = document.getElementById("rankingTableBody");
+    tagWrapper.style.display = metric === "tag" ? "block" : "none";
 
-    let sorted = [...rankingRawData];
-    let criterionLabel = "";
-    let barColor = "#059669";
-
-    if (criterion === "pos") {
-      sorted.sort((a, b) => b.pos - a.pos);
-      criterionLabel = "مجموع امتیازات مثبت";
-      barColor = "rgba(5, 150, 105, 0.85)";
-    } else if (criterion === "total") {
-      sorted.sort((a, b) => b.total - a.total);
-      criterionLabel = "جمع کل برآیند امتیاز";
-      barColor = "rgba(30, 58, 138, 0.85)";
-    } else if (criterion === "neg") {
-      sorted.sort((a, b) => a.neg - b.neg); // بیشترین منفی در اولویت
-      criterionLabel = "مجموع امتیازات منفی (تذکرات)";
-      barColor = "rgba(220, 38, 38, 0.85)";
+    if (!allActivities.length) {
+      var res = await apiCall("listActivities");
+      if (res.ok) allActivities = res.activities || [];
     }
 
-    const limit = (limitVal === "all") ? sorted.length : parseInt(limitVal, 10);
-    const displayList = sorted.slice(0, limit);
+    var now = new Date().toLocaleDateString('fa-IR');
+    document.getElementById("chartDate").textContent = "تاریخ گزارش: " + now;
 
-    document.getElementById("chartTitle").textContent = `نمودار مقایسه‌ای ${displayList.length} طلبه بر اساس «${criterionLabel}»`;
-
-    // رسم جدول رتبه‌بندی
-    tbody.innerHTML = displayList.map((p, idx) => `
-      <tr>
-        <td style="text-align:center; font-weight:bold; color:var(--primary);">${idx + 1}</td>
-        <td><strong>${p.fullName}</strong></td>
-        <td><span class="badge badge-grade">${p.grade}</span></td>
-        <td>${p.fileNo || '—'}</td>
-        <td style="text-align:center; font-weight:bold; color:var(--success);">+${p.pos}</td>
-        <td style="text-align:center; font-weight:bold; color:var(--danger);">${p.neg}</td>
-        <td style="text-align:center; font-weight:800; font-size:13.5px; color:${p.total >= 0 ? 'var(--success)' : 'var(--danger)'};">
-          ${p.total >= 0 ? '+' + p.total : p.total}
-        </td>
-      </tr>
-    `).join("");
-
-    // آماده‌سازی داده‌های نمودار
-    const labels = displayList.map(p => p.fullName);
-    const dataValues = displayList.map(p => {
-      if (criterion === "pos") return p.pos;
-      if (criterion === "total") return p.total;
-      return Math.abs(p.neg); // برای نمایش ستونی مثبت در منفی‌ها
+    var personScoreMap = {};
+    allPeople.forEach(function(p) {
+      personScoreMap[p.id] = { id: p.id, fullName: p.fullName, grade: p.grade, pos: 0, neg: 0, net: 0, count: 0, tagCount: 0, tagScore: 0 };
     });
 
-    const ctx = document.getElementById("rankingCanvas").getContext("2d");
-    if (chartInstance) chartInstance.destroy();
+    allActivities.forEach(function(a) {
+      var pid = a.personId;
+      if (!personScoreMap[pid]) {
+        personScoreMap[pid] = { id: pid, fullName: a.fullName, grade: a.grade, pos: 0, neg: 0, net: 0, count: 0, tagCount: 0, tagScore: 0 };
+      }
+      if (a.score > 0) personScoreMap[pid].pos += a.score;
+      if (a.score < 0) personScoreMap[pid].neg += a.score;
+      personScoreMap[pid].net += a.score;
+      personScoreMap[pid].count++;
 
-    chartInstance = new Chart(ctx, {
-      type: "bar",
-      data: {
-        labels: labels,
-        datasets: [{
-          label: criterionLabel,
-          data: dataValues,
-          backgroundColor: barColor,
-          borderColor: barColor,
-          borderRadius: 6,
-          borderWidth: 1
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            labels: { font: { family: 'Vazirmatn', size: 12 } }
-          },
-          tooltip: {
-            titleFont: { family: 'Vazirmatn' },
-            bodyFont: { family: 'Vazirmatn' }
-          }
-        },
-        scales: {
-          x: {
-            ticks: { font: { family: 'Vazirmatn', size: 11 }, maxRotation: 45, minRotation: 0 }
-          },
-          y: {
-            beginAtZero: true,
-            ticks: { font: { family: 'Vazirmatn', size: 11 } }
-          }
-        }
+      // محاسبه تکرار و امتیاز برچسب انتخاب‌شده
+      if (metric === "tag" && tagFilter && a.description && a.description.includes(tagFilter)) {
+        personScoreMap[pid].tagCount++;
+        personScoreMap[pid].tagScore += a.score;
       }
     });
+
+    var list = Object.values(personScoreMap);
+
+    if (gradeFilter !== "all") {
+      list = list.filter(function(p) { return p.grade === gradeFilter; });
+    }
+
+    if (metric === "pos") {
+      chartTitle.innerHTML = '<i class="fa-solid fa-arrow-trend-up" style="color:var(--success);"></i> رتبه‌بندی مثبت‌ترین طلاب (بیشترین تشویق)';
+      list = list.filter(function(p) { return p.pos > 0; });
+      list.sort(function(a, b) { return b.pos - a.pos; });
+    } else if (metric === "neg") {
+      chartTitle.innerHTML = '<i class="fa-solid fa-arrow-trend-down" style="color:var(--danger);"></i> رتبه‌بندی منفی‌ترین طلاب (بیشترین کسر امتیاز)';
+      list = list.filter(function(p) { return p.neg < 0; });
+      list.sort(function(a, b) { return a.neg - b.neg; });
+    } else if (metric === "tag") {
+      chartTitle.innerHTML = '⭐ رتبه‌بندی بر اساس برچسب: <b>' + (tagFilter || 'انتخاب نشده') + '</b>';
+      list = list.filter(function(p) { return p.tagCount > 0; });
+      list.sort(function(a, b) { return b.tagCount - a.tagCount || Math.abs(b.tagScore) - Math.abs(a.tagScore); });
+    } else {
+      chartTitle.innerHTML = '<i class="fa-solid fa-scale-balanced" style="color:var(--primary);"></i> رتبه‌بندی بر اساس تراز نهایی امتیازات';
+      list.sort(function(a, b) { return b.net - a.net; });
+    }
+
+    if (countFilter !== "all") {
+      list = list.slice(0, parseInt(countFilter));
+    }
+
+    if (!list.length) {
+      container.innerHTML = '<div style="text-align:center; padding:35px; color:var(--text-muted);">با فیلترهای انتخابی موردی برای نمایش وجود ندارد.</div>';
+      return;
+    }
+
+    var maxVal = 1;
+    if (metric === "pos") {
+      maxVal = Math.max.apply(null, list.map(function(p) { return p.pos; }).concat([1]));
+    } else if (metric === "neg") {
+      maxVal = Math.max.apply(null, list.map(function(p) { return Math.abs(p.neg); }).concat([1]));
+    } else if (metric === "tag") {
+      maxVal = Math.max.apply(null, list.map(function(p) { return p.tagCount; }).concat([1]));
+    } else {
+      maxVal = Math.max.apply(null, list.map(function(p) { return Math.abs(p.net); }).concat([1]));
+    }
+
+    container.innerHTML = list.map(function(item, idx) {
+      var val = 0;
+      var displayVal = "";
+      var barClass = "";
+
+      if (metric === "pos") {
+        val = item.pos;
+        displayVal = "+" + item.pos;
+        barClass = "rank-bar-pos";
+      } else if (metric === "neg") {
+        val = Math.abs(item.neg);
+        displayVal = String(item.neg);
+        barClass = "rank-bar-neg";
+      } else if (metric === "tag") {
+        val = item.tagCount;
+        displayVal = item.tagCount + " بار (" + (item.tagScore >= 0 ? "+" : "") + item.tagScore + ")";
+        barClass = "rank-bar-tag";
+      } else {
+        val = Math.abs(item.net);
+        displayVal = item.net >= 0 ? "+" + item.net : String(item.net);
+        barClass = item.net >= 0 ? "rank-bar-pos" : "rank-bar-neg";
+      }
+
+      var percent = Math.min(100, Math.max(8, Math.round((val / maxVal) * 100)));
+      var rankBadgeClass = idx === 0 ? 'rank-top-1' : (idx === 1 ? 'rank-top-2' : (idx === 2 ? 'rank-top-3' : ''));
+      var valColor = metric === 'neg' ? 'var(--danger)' : (metric === 'pos' ? 'var(--success)' : (metric === 'tag' ? '#4f46e5' : 'var(--primary)'));
+
+      return '<div class="rank-row">' +
+        '<div class="rank-number ' + rankBadgeClass + '">' + (idx + 1) + '</div>' +
+        '<div>' +
+          '<div style="font-weight:700; font-size:13px; color:var(--text-main); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + item.fullName + '</div>' +
+          '<div style="font-size:10.5px; color:var(--text-muted);">' + item.grade + '</div>' +
+        '</div>' +
+        '<div class="rank-bar-bg">' +
+          '<div class="rank-bar-fill ' + barClass + '" style="width: ' + percent + '%;"></div>' +
+        '</div>' +
+        '<div style="font-weight:800; font-size:12.5px; text-align:left; color:' + valColor + ';">' +
+          displayVal +
+        '</div>' +
+      '</div>';
+    }).join("");
   }
 
-  function downloadChartImage() {
-    if (!chartInstance) return alert("ابتدا داده‌های نمودار باید بارگذاری شوند.");
-    
-    // گرفتن تصویر از canvas
-    const imageURI = chartInstance.toBase64Image();
-    const link = document.createElement("a");
-    link.download = `نمودار_رتبه_بندی_طلاب_${Date.now()}.png`;
-    link.href = imageURI;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  async function exportRankingImage() {
+    var card = document.getElementById("rankingExportCard");
+    try {
+      showToast("در حال ایجاد خروجی تصویری...", "success");
+      var canvas = await html2canvas(card, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#ffffff"
+      });
+      var link = document.createElement("a");
+      link.download = "رتبه‌بندی_طلاب_" + new Date().toLocaleDateString('fa-IR').replace(/\//g, '-') + ".png";
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+      showToast("تصویر نمودار با موفقیت دانلود شد.", "success");
+    } catch (e) {
+      console.error(e);
+      showToast("خطا در ایجاد خروجی تصویر.", "error");
+    }
   }
+
+  // بستن منوی کشویی در کلیک بیرون
+  document.addEventListener("click", function(e) {
+    var wrapper = document.querySelector(".search-select-wrapper");
+    if (wrapper && !wrapper.contains(e.target)) {
+      document.getElementById("profileDropdown").style.display = "none";
+    }
+  });
 
   loadPeople();
 </script>

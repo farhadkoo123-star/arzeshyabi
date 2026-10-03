@@ -7,6 +7,8 @@
   
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- کتابخانه نمودارساز Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
   <style>
     :root {
@@ -29,7 +31,7 @@
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Vazirmatn', Tahoma, sans-serif; }
     body { background-color: var(--bg); color: var(--text-main); padding: 25px 12px; min-height: 100vh; display: flex; justify-content: center; }
-    .app-container { width: 100%; max-width: 1050px; display: flex; flex-direction: column; gap: 18px; }
+    .app-container { width: 100%; max-width: 1100px; display: flex; flex-direction: column; gap: 18px; }
 
     /* هدر */
     .app-header {
@@ -42,11 +44,11 @@
 
     /* تب‌های ناوبری */
     .tabs-nav {
-      display: flex; gap: 8px; background: #e2e8f0; padding: 5px; border-radius: 10px;
+      display: flex; gap: 8px; background: #e2e8f0; padding: 5px; border-radius: 10px; flex-wrap: wrap;
     }
     .tab-btn {
-      flex: 1; padding: 10px 16px; border: none; background: transparent; font-weight: 700;
-      font-size: 13.5px; border-radius: 8px; cursor: pointer; color: var(--text-muted);
+      flex: 1; min-width: 140px; padding: 10px 14px; border: none; background: transparent; font-weight: 700;
+      font-size: 13px; border-radius: 8px; cursor: pointer; color: var(--text-muted);
       display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s;
     }
     .tab-btn.active { background: white; color: var(--primary); box-shadow: var(--shadow); }
@@ -120,7 +122,7 @@
     .toast.success { background: var(--success-soft); color: var(--success); border: 1px solid #a7f3d0; }
     .toast.error { background: var(--danger-soft); color: var(--danger); border: 1px solid #fecaca; }
 
-    /* جدول نمایش سوابق */
+    /* جدول سوابق */
     .table-container { overflow-x: auto; margin-top: 15px; }
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
     th { background: #f1f5f9; color: var(--text-main); padding: 10px; text-align: right; border-bottom: 2px solid var(--border); }
@@ -130,7 +132,7 @@
     .score-pos { background: var(--success-soft); color: var(--success); }
     .score-neg { background: var(--danger-soft); color: var(--danger); }
 
-    .summary-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 15px; }
+    .summary-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 15px; }
     .sum-card { background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 12px; text-align: center; }
     .sum-card h5 { font-size: 11.5px; color: var(--text-muted); margin-bottom: 4px; }
     .sum-card .val { font-size: 18px; font-weight: 800; }
@@ -139,48 +141,37 @@
     .pdf-card { background: white; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px; display: flex; justify-content: space-between; align-items: center; text-decoration: none; color: inherit; }
 
     /* استایل‌های اختصاصی جستجوی زنده پرونده */
-    .search-select-wrapper {
-      position: relative;
-      flex: 1;
-      min-width: 260px;
-    }
+    .search-select-wrapper { position: relative; flex: 1; min-width: 260px; }
     .search-results-dropdown {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
-      max-height: 240px;
-      overflow-y: auto;
-      background: #ffffff;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      margin-top: 4px;
-      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-      z-index: 100;
-      display: none;
+      position: absolute; top: 100%; left: 0; right: 0; max-height: 240px; overflow-y: auto;
+      background: #ffffff; border: 1px solid var(--border); border-radius: 8px; margin-top: 4px;
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 100; display: none;
     }
     .search-result-item {
-      padding: 10px 12px;
-      cursor: pointer;
-      border-bottom: 1px solid #f1f5f9;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: background 0.15s;
+      padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #f1f5f9; display: flex;
+      justify-content: space-between; align-items: center; transition: background 0.15s;
     }
     .search-result-item:last-child { border-bottom: none; }
-    .search-result-item:hover {
-      background: var(--primary-soft);
-    }
+    .search-result-item:hover { background: var(--primary-soft); }
     .selected-person-badge {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: #eff6ff;
-      border: 1px solid #bfdbfe;
-      border-radius: 8px;
-      padding: 8px 12px;
-      margin-bottom: 12px;
+      display: flex; align-items: center; justify-content: space-between; background: #eff6ff;
+      border: 1px solid #bfdbfe; border-radius: 8px; padding: 8px 12px; margin-bottom: 12px;
+    }
+
+    /* کارت برآیند کل امتیاز طلبه */
+    .total-score-box {
+      border: 2px solid var(--primary-light);
+      background: #f0f7ff;
+    }
+
+    /* استایل‌های تب رتبه‌بندی و نمودار */
+    .ranking-toolbar {
+      display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: space-between;
+      background: #f8fafc; padding: 12px 16px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 15px;
+    }
+    .chart-container-card {
+      background: #ffffff; border: 1px solid var(--border); border-radius: 10px; padding: 16px;
+      margin-bottom: 20px; position: relative;
     }
   </style>
 </head>
@@ -207,6 +198,9 @@
     <button class="tab-btn" id="tabBtnProfile" onclick="switchTab('profile')">
       <i class="fa-solid fa-id-card"></i> پرونده اختصاصی طلبه
     </button>
+    <button class="tab-btn" id="tabBtnRanking" onclick="switchTab('ranking')">
+      <i class="fa-solid fa-chart-column"></i> رتبه‌بندی و نمودار تحلیلی
+    </button>
   </div>
 
   <!-- نوار رمز -->
@@ -218,7 +212,7 @@
           <input type="password" id="apiToken" value="123456" />
         </div>
       </div>
-      <span style="font-size:11.5px; color:var(--text-muted);">نسخه جامع توسعه‌یافته</span>
+      <span style="font-size:11.5px; color:var(--text-muted);">نسخه جامع تحلیلی و رتبه‌بندی</span>
     </div>
   </div>
 
@@ -297,7 +291,7 @@
 
   <!-- صفحه ۲: سوابق و نمرات کلی -->
   <main class="card" id="sectionHistory" style="display:none;">
-    <div class="summary-cards">
+    <div class="summary-cards" style="grid-template-columns: repeat(3, 1fr);">
       <div class="sum-card">
         <h5>تعداد کل موارد ثبت‌شده</h5>
         <div class="val" id="totalLogs">۰</div>
@@ -343,17 +337,13 @@
 
   <!-- صفحه ۳: پرونده اختصاصی طلبه -->
   <main class="card" id="sectionProfile" style="display:none;">
-    
     <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:15px; background:#f8fafc; padding:12px; border-radius:8px; border:1px solid var(--border);">
-      
-      <!-- نوار جستجو و انتخاب طلبه -->
       <div class="search-select-wrapper">
         <div class="input-group" style="background: white;">
           <i class="fa-solid fa-magnifying-glass"></i>
           <input type="text" id="profileSearchInput" placeholder="جستجوی طلبه با نام، شماره پرونده یا پایه..." oninput="onProfileSearchInput()" onfocus="onProfileSearchFocus()" autocomplete="off" />
           <i class="fa-solid fa-xmark" id="clearProfileSearchBtn" style="cursor:pointer; display:none;" onclick="clearProfileSelection()"></i>
         </div>
-
         <div id="profileDropdown" class="search-results-dropdown"></div>
       </div>
 
@@ -366,7 +356,6 @@
       </button>
     </div>
 
-    <!-- مشخصات طلبه انتخاب شده -->
     <div id="selectedPersonInfo" class="selected-person-badge" style="display:none;">
       <div>
         <i class="fa-solid fa-user-graduate" style="color:var(--primary); margin-left:6px;"></i>
@@ -381,18 +370,23 @@
       </button>
     </div>
 
+    <!-- کارت‌های آماری پرونده اختصاصی همراه با کادر شاخص مجموع امتیازات -->
     <div class="summary-cards">
-      <div class="sum-card">
-        <h5>تعداد سوابق این فرد</h5>
-        <div class="val" id="p_totalLogs">۰</div>
+      <div class="sum-card total-score-box">
+        <h5 style="color:var(--primary); font-weight:bold;"><i class="fa-solid fa-award"></i> مجموع کل نهایی امتیازات</h5>
+        <div class="val" id="p_totalScore" style="color:var(--primary); font-size:22px;">۰</div>
       </div>
       <div class="sum-card">
-        <h5>مجموع مثبت</h5>
+        <h5>مجموع امتیازات مثبت</h5>
         <div class="val" style="color:var(--success);" id="p_totalPos">۰</div>
       </div>
       <div class="sum-card">
-        <h5>مجموع منفی</h5>
+        <h5>مجموع کسر امتیازات</h5>
         <div class="val" style="color:var(--danger);" id="p_totalNeg">۰</div>
+      </div>
+      <div class="sum-card">
+        <h5>تعداد دفعات ثبت</h5>
+        <div class="val" id="p_totalLogs">۰</div>
       </div>
     </div>
 
@@ -413,15 +407,83 @@
     </div>
   </main>
 
+  <!-- صفحه ۴: رتبه‌بندی و نمودار تحلیلی -->
+  <main class="card" id="sectionRanking" style="display:none;">
+    <div class="ranking-toolbar">
+      <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+        <label style="font-size:12.5px; font-weight:bold;">معیار رتبه‌بندی:</label>
+        <select id="rankingCriterion" class="custom-select" onchange="renderRankingChart()">
+          <option value="pos">بیشترین امتیاز مثبت (تشویق‌ها)</option>
+          <option value="total">بالاترین برآیند مجموع امتیاز</option>
+          <option value="neg">بیشترین کسر امتیاز (منفی‌ترین‌ها)</option>
+        </select>
+
+        <label style="font-size:12.5px; font-weight:bold; margin-right:8px;">تعداد نمایش:</label>
+        <select id="rankingLimit" class="custom-select" onchange="renderRankingChart()">
+          <option value="5">۵ نفر برتر</option>
+          <option value="10" selected>۱۰ نفر برتر</option>
+          <option value="15">۱۵ نفر برتر</option>
+          <option value="20">۲۰ نفر برتر</option>
+          <option value="all">همه طلاب</option>
+        </select>
+      </div>
+
+      <div style="display:flex; gap:8px;">
+        <button onclick="downloadChartImage()" class="btn btn-pdf" style="padding:8px 14px; font-size:12.5px;">
+          <i class="fa-solid fa-image"></i> خروجی تصویر نمودار (PNG)
+        </button>
+        <button onclick="loadRankingData()" class="btn" style="background:#f1f5f9; color:var(--text-main); border:1px solid var(--border); padding:8px 14px; font-size:12.5px;">
+          <i class="fa-solid fa-rotate"></i> بروزرسانی داده‌ها
+        </button>
+      </div>
+    </div>
+
+    <!-- بدنه نمودار -->
+    <div class="chart-container-card" id="chartCardArea">
+      <div style="text-align:center; margin-bottom:12px;">
+        <h3 id="chartTitle" style="font-size:15px; color:var(--primary); font-weight:800;">نمودار رتبه‌بندی امتیازات طلاب</h3>
+        <p style="font-size:11.5px; color:var(--text-muted); margin-top:3px;">مدرسه علمیه امام صادق (ع) اردکان</p>
+      </div>
+      <div style="position:relative; height:340px; width:100%;">
+        <canvas id="rankingCanvas"></canvas>
+      </div>
+    </div>
+
+    <!-- جدول رتبه‌بندی -->
+    <h4 style="font-size:13.5px; margin:16px 0 8px 0; color:var(--text-main);">
+      <i class="fa-solid fa-list-ol" style="color:var(--primary); margin-left:4px;"></i> جدول تفصیلی رتبه‌بندی طلاب:
+    </h4>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th style="text-align:center; width:60px;">رتبه</th>
+            <th>نام و نام خانوادگی</th>
+            <th>پایه</th>
+            <th>شماره پرونده</th>
+            <th style="text-align:center;">مجموع مثبت</th>
+            <th style="text-align:center;">مجموع منفی</th>
+            <th style="text-align:center;">جمع کل نهایی</th>
+          </tr>
+        </thead>
+        <tbody id="rankingTableBody">
+          <tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:25px;">در حال بارگذاری داده‌های رتبه‌بندی...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
 </div>
 
 <script>
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzVbruiOgQrJP0qBYsyNIc-3yWO0OOxfZz68ra0arObhCI4dRH5G7B_g-2x1wFnk7zsjg/exec";
   let allPeople = [];
   let allActivities = [];
+  let rankingRawData = [];
   let currentProfilePersonId = "";
+  let chartInstance = null;
 
-  function getApiToken() {
+  function GAPGPTMASKTOKEN8q2xpu5asvmX1X {
     return document.getElementById("apiToken").value.trim();
   }
 
@@ -438,26 +500,29 @@
     document.getElementById("sectionRegister").style.display = (tab === 'register') ? 'block' : 'none';
     document.getElementById("sectionHistory").style.display = (tab === 'history') ? 'block' : 'none';
     document.getElementById("sectionProfile").style.display = (tab === 'profile') ? 'block' : 'none';
+    document.getElementById("sectionRanking").style.display = (tab === 'ranking') ? 'block' : 'none';
 
     document.getElementById("tabBtnRegister").classList.toggle("active", tab === 'register');
     document.getElementById("tabBtnHistory").classList.toggle("active", tab === 'history');
     document.getElementById("tabBtnProfile").classList.toggle("active", tab === 'profile');
+    document.getElementById("tabBtnRanking").classList.toggle("active", tab === 'ranking');
 
     if (tab === 'history') loadActivities();
+    if (tab === 'ranking') loadRankingData();
   }
 
   async function apiCall(action, payload = {}) {
     const res = await fetch(SCRIPT_URL, {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({ action, token: getApiToken(), ...payload })
+      body: JSON.stringify({ action, token: GAPGPTMASKTOKEN8q2xpu5asvmX2X, ...payload })
     });
 
     const text = await res.text();
     try {
       return JSON.parse(text);
     } catch (e) {
-      throw new Error("پاسخ سرور JSON نیست. (احتمالاً مشکل Deploy/Access دارید)\n" + text.slice(0, 200));
+      throw new Error("پاسخ سرور JSON نیست. (احتمالاً دسترسی انتشار نیاز به New version دارد)\n" + text.slice(0, 200));
     }
   }
 
@@ -679,7 +744,7 @@
     }
   }
 
-  /* --- بخش اختصاصی پرونده طلبه با قابلیت جستجوی زنده --- */
+  /* --- بخش پرونده اختصاصی طلبه --- */
 
   function onProfileSearchFocus() {
     renderProfileDropdown(document.getElementById("profileSearchInput").value);
@@ -731,7 +796,6 @@
     document.getElementById("profileDropdown").style.display = "none";
     document.getElementById("clearProfileSearchBtn").style.display = "block";
 
-    // بروزرسانی بج مشخصات فرد
     document.getElementById("p_dispName").textContent = p.fullName;
     document.getElementById("p_dispGrade").textContent = p.grade || "—";
     document.getElementById("p_dispFileNo").textContent = p.fileNo || "—";
@@ -747,13 +811,14 @@
     document.getElementById("clearProfileSearchBtn").style.display = "none";
     document.getElementById("selectedPersonInfo").style.display = "none";
 
+    document.getElementById("p_totalScore").textContent = "۰";
+    document.getElementById("p_totalScore").style.color = "var(--primary)";
     document.getElementById("p_totalLogs").textContent = "۰";
     document.getElementById("p_totalPos").textContent = "۰";
     document.getElementById("p_totalNeg").textContent = "۰";
     document.getElementById("profileTableBody").innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:30px;">از کادر بالا یک طلبه را جستجو و انتخاب کنید.</td></tr>`;
   }
 
-  // بستن منوی کشویی جستجو با کلیک بیرون از کادر
   document.addEventListener("click", function(e) {
     const wrapper = document.querySelector(".search-select-wrapper");
     if (wrapper && !wrapper.contains(e.target)) {
@@ -770,9 +835,14 @@
       const res = await apiCall("getPersonProfile", { personId: pid });
       if (!res.ok) throw new Error(res.error || "خطا در دریافت پرونده");
 
-      document.getElementById("p_totalLogs").textContent = res.totals.count;
-      document.getElementById("p_totalPos").textContent = `+${res.totals.pos}`;
-      document.getElementById("p_totalNeg").textContent = `${res.totals.neg}`;
+      const totals = res.totals || { total: 0, pos: 0, neg: 0, count: 0 };
+      const totalScoreEl = document.getElementById("p_totalScore");
+      totalScoreEl.textContent = (totals.total >= 0 ? "+" : "") + totals.total;
+      totalScoreEl.style.color = totals.total >= 0 ? "var(--success)" : "var(--danger)";
+
+      document.getElementById("p_totalLogs").textContent = totals.count;
+      document.getElementById("p_totalPos").textContent = `+${totals.pos}`;
+      document.getElementById("p_totalNeg").textContent = `${totals.neg}`;
 
       const list = res.activities || [];
       if (!list.length) {
@@ -834,6 +904,130 @@
     } catch(e) {
       alert("خطا در ساخت PDF جامع.");
     }
+  }
+
+  /* --- بخش رتبه‌بندی، تحلیل و نمودار --- */
+
+  async function loadRankingData() {
+    const tbody = document.getElementById("rankingTableBody");
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:25px;"><i class="fa-solid fa-spinner fa-spin"></i> در حال پردازش رتبه‌بندی و محاسبات...</td></tr>`;
+
+    try {
+      const res = await apiCall("getRankingStats");
+      if (!res.ok) throw new Error(res.error || "خطا در دریافت آمار رتبه‌بندی");
+      rankingRawData = res.ranking || [];
+      renderRankingChart();
+    } catch (e) {
+      console.error(e);
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--danger); padding:20px;">خطا در دریافت داده‌های رتبه‌بندی.</td></tr>`;
+    }
+  }
+
+  function renderRankingChart() {
+    if (!rankingRawData.length) return;
+
+    const criterion = document.getElementById("rankingCriterion").value;
+    const limitVal = document.getElementById("rankingLimit").value;
+    const tbody = document.getElementById("rankingTableBody");
+
+    let sorted = [...rankingRawData];
+    let criterionLabel = "";
+    let barColor = "#059669";
+
+    if (criterion === "pos") {
+      sorted.sort((a, b) => b.pos - a.pos);
+      criterionLabel = "مجموع امتیازات مثبت";
+      barColor = "rgba(5, 150, 105, 0.85)";
+    } else if (criterion === "total") {
+      sorted.sort((a, b) => b.total - a.total);
+      criterionLabel = "جمع کل برآیند امتیاز";
+      barColor = "rgba(30, 58, 138, 0.85)";
+    } else if (criterion === "neg") {
+      sorted.sort((a, b) => a.neg - b.neg); // بیشترین منفی در اولویت
+      criterionLabel = "مجموع امتیازات منفی (تذکرات)";
+      barColor = "rgba(220, 38, 38, 0.85)";
+    }
+
+    const limit = (limitVal === "all") ? sorted.length : parseInt(limitVal, 10);
+    const displayList = sorted.slice(0, limit);
+
+    document.getElementById("chartTitle").textContent = `نمودار مقایسه‌ای ${displayList.length} طلبه بر اساس «${criterionLabel}»`;
+
+    // رسم جدول رتبه‌بندی
+    tbody.innerHTML = displayList.map((p, idx) => `
+      <tr>
+        <td style="text-align:center; font-weight:bold; color:var(--primary);">${idx + 1}</td>
+        <td><strong>${p.fullName}</strong></td>
+        <td><span class="badge badge-grade">${p.grade}</span></td>
+        <td>${p.fileNo || '—'}</td>
+        <td style="text-align:center; font-weight:bold; color:var(--success);">+${p.pos}</td>
+        <td style="text-align:center; font-weight:bold; color:var(--danger);">${p.neg}</td>
+        <td style="text-align:center; font-weight:800; font-size:13.5px; color:${p.total >= 0 ? 'var(--success)' : 'var(--danger)'};">
+          ${p.total >= 0 ? '+' + p.total : p.total}
+        </td>
+      </tr>
+    `).join("");
+
+    // آماده‌سازی داده‌های نمودار
+    const labels = displayList.map(p => p.fullName);
+    const dataValues = displayList.map(p => {
+      if (criterion === "pos") return p.pos;
+      if (criterion === "total") return p.total;
+      return Math.abs(p.neg); // برای نمایش ستونی مثبت در منفی‌ها
+    });
+
+    const ctx = document.getElementById("rankingCanvas").getContext("2d");
+    if (chartInstance) chartInstance.destroy();
+
+    chartInstance = new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: labels,
+        datasets: [{
+          label: criterionLabel,
+          data: dataValues,
+          backgroundColor: barColor,
+          borderColor: barColor,
+          borderRadius: 6,
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            labels: { font: { family: 'Vazirmatn', size: 12 } }
+          },
+          tooltip: {
+            titleFont: { family: 'Vazirmatn' },
+            bodyFont: { family: 'Vazirmatn' }
+          }
+        },
+        scales: {
+          x: {
+            ticks: { font: { family: 'Vazirmatn', size: 11 }, maxRotation: 45, minRotation: 0 }
+          },
+          y: {
+            beginAtZero: true,
+            ticks: { font: { family: 'Vazirmatn', size: 11 } }
+          }
+        }
+      }
+    });
+  }
+
+  function downloadChartImage() {
+    if (!chartInstance) return alert("ابتدا داده‌های نمودار باید بارگذاری شوند.");
+    
+    // گرفتن تصویر از canvas
+    const imageURI = chartInstance.toBase64Image();
+    const link = document.createElement("a");
+    link.download = `نمودار_رتبه_بندی_طلاب_${Date.now()}.png`;
+    link.href = imageURI;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }
 
   loadPeople();

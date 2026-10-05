@@ -233,20 +233,62 @@
     .rank-bar-neg { background: linear-gradient(90deg, #ef4444, #dc2626); }
     .rank-bar-tag { background: linear-gradient(90deg, #6366f1, #4f46e5); }
 
-    /* مدال تعریف برچسب */
+    /* مدال‌ها */
     .modal-overlay {
-      position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4);
+      position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5);
       display: none; align-items: center; justify-content: center; z-index: 1000; padding: 15px;
+      backdrop-filter: blur(4px);
     }
     .modal-box {
-      background: white; border-radius: var(--radius); padding: 20px;
+      background: white; border-radius: var(--radius); padding: 22px;
       max-width: 400px; width: 100%; box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+
+    /* پرده ورود */
+    #loginOverlay {
+      position: fixed; inset: 0; background: #0f172a;
+      display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 16px;
+    }
+    .login-card {
+      background: #ffffff; border-radius: 16px; padding: 32px 28px;
+      max-width: 380px; width: 100%; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+      text-align: center;
+    }
+    .login-avatar {
+      width: 64px; height: 64px; background: var(--primary-soft); color: var(--primary);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px auto; font-size: 28px;
     }
   </style>
 </head>
 <body>
 
-<div class="app-container">
+<!-- پرده لاگین -->
+<div id="loginOverlay">
+  <div class="login-card">
+    <div class="login-avatar">
+      <i class="fa-solid fa-shield-halved"></i>
+    </div>
+    <h2 style="font-size: 18px; font-weight: 800; color: var(--primary); margin-bottom: 6px;">ورود به سامانه ارزشیابی</h2>
+    <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 22px;">مدرسه علمیه حضرت امام صادق (ع) اردکان</p>
+    
+    <div style="text-align: right; margin-bottom: 6px;">
+      <label style="font-size: 12px; font-weight: bold; color: var(--text-main);">رمز عبور پرسنلی / معاونت:</label>
+    </div>
+    <div class="input-group" style="margin-bottom: 14px; background: #f8fafc; border: 1.5px solid var(--border);">
+      <i class="fa-solid fa-key"></i>
+      <input type="password" id="loginPasswordInput" placeholder="رمز عبور را وارد نمایید..." style="font-size: 14px; text-align: center; letter-spacing: 2px;" onkeydown="if(event.key==='Enter') submitLogin()" />
+    </div>
+
+    <div id="loginErrorMsg" style="display:none; color: var(--danger); font-size: 12px; margin-bottom: 12px; font-weight: 600;"></div>
+
+    <button class="btn btn-primary" id="loginBtn" onclick="submitLogin()" style="width: 100%; padding: 12px;">
+      <i class="fa-solid fa-arrow-right-to-bracket"></i> ورود به پنل
+    </button>
+  </div>
+</div>
+
+<div class="app-container" id="mainApp" style="display:none;">
 
   <header class="app-header">
     <div class="header-titles">
@@ -272,16 +314,16 @@
     </button>
   </div>
 
-  <!-- نوار رمز -->
+  <!-- نوار وضعیت کاربر لاگین‌شده -->
   <div class="card" style="padding: 10px 18px;">
     <div class="top-bar">
       <div style="display:flex; align-items:center; gap:8px;">
-        <span style="font-size:12.5px; font-weight:bold;"><i class="fa-solid fa-key" style="color:var(--warning);"></i> رمز پرسنلی:</span>
-        <div class="input-group" style="width:160px;">
-          <input type="password" id="apiToken" value="123456" />
-        </div>
+        <span style="font-size:12.5px; font-weight:bold; color:var(--primary);"><i class="fa-solid fa-user-check"></i> حساب فعال:</span>
+        <span style="font-size:13px; font-weight:800; color:var(--text-main);" id="deputyRoleBadge">در حال اعتبارسنجی...</span>
       </div>
-      <span style="font-size:11.5px; color:var(--text-muted);">نسخه جامع و ارتقاء‌یافته</span>
+      <button onclick="logout()" style="background: none; border: none; color: var(--danger); font-size: 12.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i> خروج از حساب
+      </button>
     </div>
   </div>
 
@@ -344,7 +386,7 @@
     <div class="tags-panel">
       <div class="tags-panel-header">
         <span style="font-size: 12px; font-weight: 700; color: var(--text-muted);">
-          <i class="fa-solid fa-tags" style="color:var(--primary);"></i> برچسب‌های فعالیت سریع (درج فوری شرح و امتیاز):
+          <i class="fa-solid fa-tags" style="color:var(--primary);"></i> برچسب‌های فعالیت بخش شما (درج فوری شرح و امتیاز):
         </span>
         <button onclick="openNewTagModal()" style="background: none; border: none; color: var(--primary); font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px;">
           <i class="fa-solid fa-circle-plus"></i> افزودن برچسب جدید
@@ -524,7 +566,7 @@
       <div id="rankTagFilterWrapper" style="display:none;">
         <label style="font-size:11.5px; font-weight:bold; display:block; margin-bottom:4px; color:#4338ca;">برچسب مورد نظر:</label>
         <select id="rankTagSelect" class="custom-select" style="width:100%;" onchange="renderRankingChart()">
-          <!-- لیست برچسب‌ها با اسکریپت پر می‌شود -->
+          <option value="">انتخاب برچسب...</option>
         </select>
       </div>
 
@@ -554,7 +596,7 @@
       </div>
     </div>
 
-    <!-- کادر نمودار قابل صدور به عکس -->
+    <!-- کادر نمودار -->
     <div id="rankingExportCard" style="background:#ffffff; border:1px solid var(--border); border-radius:10px; padding:18px;">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #e2e8f0; padding-bottom:8px; margin-bottom:14px;">
         <span style="font-weight:800; font-size:13.5px; color:var(--text-main);" id="chartTitle">نمودار امتیازات برتر طلاب</span>
@@ -569,7 +611,7 @@
 
 </div>
 
-<!-- مدال شیک افزودن برچسب جدید -->
+<!-- مدال افزودن برچسب -->
 <div class="modal-overlay" id="newTagModal">
   <div class="modal-box">
     <h3 style="font-size:14px; font-weight:800; margin-bottom:12px; color:var(--primary);"><i class="fa-solid fa-tag"></i> افزودن برچسب فعالیت جدید</h3>
@@ -592,8 +634,7 @@
 </div>
 
 <script>
-  // اگر فایل HTML را مستقیماً از روی ویندوز باز می‌کنید، لینک Deployment وب‌اپ گوگل را داخل کوتیشن زیر بگذارید:
-  var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw6soGakK1urWucaoUBHNYd9J6cJU-_3oFcf7RNV0bKAVdDrFHWRWE_c2fs5a7icWLjBg/exec"; 
+  var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyRHs_MX2Dn7fgIi1IT0NPCwK9vAx9ehnaqDP5i5tlzaQU5a-DsCqnj4HoCbLNGZDU/exec"; 
 
   var allPeople = [];
   var selectedPeople = new Set();
@@ -601,15 +642,39 @@
   var allTags = [];
   var currentProfilePersonId = null;
 
+  var DEFAULT_DEPARTMENT_TAGS = {
+    "معاونت اجرایی": [
+      { id: "TAG-1", name: "نظم تلفن همراه", defaultScore: -2 },
+      { id: "TAG-2", name: "نظافت حجره و موارد دیگر", defaultScore: 1 },
+      { id: "TAG-3", name: "ورود و خروج از مدرسه", defaultScore: -2 },
+      { id: "TAG-4", name: "پارک وسیله نقلیه", defaultScore: -1 }
+    ],
+    "معاونت تهذیب": [
+      { id: "TAG-5", name: "رعایت قوانین حجره", defaultScore: 1 },
+      { id: "TAG-6", name: "زیّ طلبگی", defaultScore: 2 },
+      { id: "TAG-7", name: "رعایت اخلاق و آداب با اساتید و کادر", defaultScore: 2 },
+      { id: "TAG-8", name: "نماز جماعت", defaultScore: 2 }
+    ],
+    "معاونت آموزش": [
+      { id: "TAG-9", name: "جلسات عمومی", defaultScore: 1 },
+      { id: "TAG-10", name: "مباحثه", defaultScore: 2 },
+      { id: "TAG-11", name: "کتابخانه", defaultScore: 1 },
+      { id: "TAG-12", name: "نظم و انضباط کلاس", defaultScore: -2 }
+    ],
+    "معاونت پژوهش": [
+      { id: "TAG-13", name: "قوانین پژوهش الزامی", defaultScore: 2 },
+      { id: "TAG-14", name: "فوق برنامه های پژوهشی", defaultScore: 2 }
+    ]
+  };
+
   function getApiToken() {
-    return document.getElementById("apiToken").value.trim();
+    return sessionStorage.getItem("app_token") || "";
   }
 
   async function apiCall(action, payload) {
     payload = payload || {};
     payload.action = action;
     payload.token = getApiToken();
-
     var targetUrl = SCRIPT_URL || window.location.href;
     var resp = await fetch(targetUrl, {
       method: "POST",
@@ -619,15 +684,67 @@
     return await resp.json();
   }
 
+  // --- سیستم لاگین ---
+  async function submitLogin() {
+    var token = document.getElementById("loginPasswordInput").value.trim();
+    var btn = document.getElementById("loginBtn");
+    var errEl = document.getElementById("loginErrorMsg");
+
+    if (!token) {
+      errEl.textContent = "لطفاً رمز عبور را وارد نمایید.";
+      errEl.style.display = "block";
+      return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> در حال بررسی اعتبار...';
+    errEl.style.display = "none";
+
+    try {
+      var resp = await fetch(SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ action: "verifyLogin", token: token })
+      });
+      var res = await resp.json();
+
+      if (res.ok) {
+        sessionStorage.setItem("app_token", token);
+        sessionStorage.setItem("app_role", res.role);
+        initAppAfterLogin(res.role);
+      } else {
+        errEl.textContent = res.error || "رمز عبور اشتباه است.";
+        errEl.style.display = "block";
+      }
+    } catch (e) {
+      errEl.textContent = "خطا در برقراری ارتباط با سرور. لطفاً مجدداً تلاش کنید.";
+      errEl.style.display = "block";
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket"></i> ورود به پنل';
+    }
+  }
+
+  function initAppAfterLogin(roleName) {
+    document.getElementById("loginOverlay").style.display = "none";
+    document.getElementById("mainApp").style.display = "flex";
+    document.getElementById("deputyRoleBadge").textContent = roleName;
+    
+    loadPeople();
+    loadTags();
+  }
+
+  function logout() {
+    sessionStorage.removeItem("app_token");
+    sessionStorage.removeItem("app_role");
+    window.location.reload();
+  }
+
   function showToast(msg, type) {
     var toast = document.getElementById("statusToast");
     toast.className = "toast " + (type || "success");
     toast.innerHTML = (type === 'error' ? '<i class="fa-solid fa-circle-exclamation"></i> ' : '<i class="fa-solid fa-circle-check"></i> ') + msg;
     toast.style.display = "flex";
-  }
-
-  function hideToast() {
-    document.getElementById("statusToast").style.display = "none";
   }
 
   function switchTab(tab) {
@@ -665,7 +782,7 @@
     document.getElementById("score").value = val;
   }
 
-  // --- سیستم دریافت و مدیریت طلاب ---
+  // --- دریافت و مدیریت لیست طلاب ---
   async function loadPeople() {
     var container = document.getElementById("peopleContainer");
     try {
@@ -673,7 +790,6 @@
       if (!res.ok) throw new Error(res.error || "خطا در دریافت لیست");
       allPeople = res.people || [];
       renderPeople(allPeople);
-      loadTags(); // بارگذاری برچسب‌های عمومی
     } catch (e) {
       container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--danger); padding: 20px;">خطا در دریافت لیست طلاب: ' + e.message + '</div>';
     }
@@ -744,49 +860,67 @@
     return Array.from(selectedPeople);
   }
 
-  // --- سیستم برچسب‌های عمومی (Tags) ---
-  async function loadTags() {
-    try {
-      var res = await apiCall("listTags");
-      if (res.ok && res.tags) {
-        allTags = res.tags;
-      } else {
-        allTags = [
-          { id: "TAG-1", name: "حضور به‌موقع در درس و مباحثه", defaultScore: 2 },
-          { id: "TAG-2", name: "مشارکت در نماز جماعت و ادعیه", defaultScore: 2 },
-          { id: "TAG-3", name: "انضباط و پاکیزگی حجره", defaultScore: 1 },
-          { id: "TAG-4", name: "تاخیر یا غیبت در کلاس", defaultScore: -2 },
-          { id: "TAG-5", name: "عدم رعایت شئون انضباطی", defaultScore: -2 }
-        ];
-      }
-    } catch (e) {
-      allTags = [
-        { id: "TAG-1", name: "حضور به‌موقع در درس و مباحثه", defaultScore: 2 },
-        { id: "TAG-2", name: "مشارکت در اقامه نماز جماعت", defaultScore: 2 },
-        { id: "TAG-3", name: "انضباط و نظافت حجره", defaultScore: 1 },
-        { id: "TAG-4", name: "تاخیر و غیبت در درس", defaultScore: -2 }
-      ];
-    }
-    renderTags();
-    updateRankingTagsDropdown();
-  }
-
+  // --- سیستم برچسب‌ها ---
   function renderTags() {
     var container = document.getElementById("tagsContainer");
+    if (!container) return;
+
     if (!allTags.length) {
-      container.innerHTML = '<span style="font-size:11.5px; color:var(--text-muted);">برچسبی ثبت نشده است. با دکمه بالا برچسب اضافه کنید.</span>';
+      container.innerHTML = '<span style="font-size:12px; color:var(--text-muted); padding:4px;">هیچ برچسبی تعریف نشده است.</span>';
       return;
     }
 
     container.innerHTML = allTags.map(function(t) {
-      var scoreSign = t.defaultScore >= 0 ? "+" + t.defaultScore : String(t.defaultScore);
-      var scoreCls = t.defaultScore >= 0 ? "pos" : "neg";
+      var isPos = Number(t.defaultScore) >= 0;
+      var scoreClass = isPos ? "pos" : "neg";
+      var scoreSign = isPos ? "+" + t.defaultScore : t.defaultScore;
+
       return '<div class="tag-chip" onclick="applyTag(\'' + t.id + '\')">' +
         '<span>' + t.name + '</span>' +
-        '<span class="tag-chip-score ' + scoreCls + '">' + scoreSign + '</span>' +
-        '<i class="fa-solid fa-times tag-chip-delete" title="حذف برچسب" onclick="deleteTag(event, \'' + t.id + '\')"></i>' +
+        '<span class="tag-chip-score ' + scoreClass + '">' + scoreSign + '</span>' +
+        '<i class="fa-solid fa-xmark tag-chip-delete" onclick="deleteTag(event, \'' + t.id + '\')"></i>' +
       '</div>';
     }).join("");
+  }
+
+  function updateRankingTagsDropdown() {
+    var sel = document.getElementById("rankTagSelect");
+    if (!sel) return;
+    if (!allTags.length) {
+      sel.innerHTML = '<option value="">برچسبی موجود نیست</option>';
+      return;
+    }
+    var currentVal = sel.value;
+    sel.innerHTML = '<option value="">انتخاب برچسب...</option>' + allTags.map(function(t) {
+      return '<option value="' + t.name + '">' + t.name + ' (' + (t.defaultScore >= 0 ? '+' : '') + t.defaultScore + ')</option>';
+    }).join("");
+    if (currentVal) sel.value = currentVal;
+  }
+
+  async function loadTags() {
+    var role = sessionStorage.getItem("app_role") || "مدیریت";
+    var tags = [];
+
+    if (role === "مدیریت") {
+      Object.keys(DEFAULT_DEPARTMENT_TAGS).forEach(function(k) {
+        tags = tags.concat(DEFAULT_DEPARTMENT_TAGS[k]);
+      });
+    } else if (DEFAULT_DEPARTMENT_TAGS[role]) {
+      tags = DEFAULT_DEPARTMENT_TAGS[role].slice();
+    }
+
+    allTags = tags;
+    renderTags();
+    updateRankingTagsDropdown();
+
+    try {
+      var res = await apiCall("listTags");
+      if (res && res.ok && Array.isArray(res.tags) && res.tags.length > 0) {
+        allTags = res.tags;
+        renderTags();
+        updateRankingTagsDropdown();
+      }
+    } catch (e) {}
   }
 
   function applyTag(tagId) {
@@ -828,10 +962,7 @@
         throw new Error(res.error || "خطا در ثبت برچسب");
       }
     } catch (e) {
-      allTags.push({ id: "TAG-" + Date.now(), name: name, defaultScore: score });
-      renderTags();
-      updateRankingTagsDropdown();
-      showToast("برچسب با موفقیت افزوده شد.", "success");
+      showToast(e.message, "error");
     }
   }
 
@@ -847,17 +978,6 @@
     } catch (err) {
       showToast("برچسب از لیست حذف شد.", "success");
     }
-  }
-
-  function updateRankingTagsDropdown() {
-    var sel = document.getElementById("rankTagSelect");
-    if (!allTags.length) {
-      sel.innerHTML = '<option value="">برچسبی موجود نیست</option>';
-      return;
-    }
-    sel.innerHTML = allTags.map(function(t) {
-      return '<option value="' + t.name + '">' + t.name + '</option>';
-    }).join("");
   }
 
   // --- ثبت فعالیت و صدور احکام ---
@@ -1151,7 +1271,7 @@
     }
   }
 
-  // --- نمودار و رتبه‌بندی طلاب (با معیار برچسب) ---
+  // --- نمودار و رتبه‌بندی طلاب ---
   async function renderRankingChart() {
     var metric = document.getElementById("rankMetric").value;
     var gradeFilter = document.getElementById("rankGrade").value;
@@ -1186,7 +1306,6 @@
       personScoreMap[pid].net += a.score;
       personScoreMap[pid].count++;
 
-      // محاسبه تکرار و امتیاز برچسب انتخاب‌شده
       if (metric === "tag" && tagFilter && a.description && a.description.includes(tagFilter)) {
         personScoreMap[pid].tagCount++;
         personScoreMap[pid].tagScore += a.score;
@@ -1307,7 +1426,19 @@
     }
   });
 
-  loadPeople();
+  // بررسی وضعیت لاگین
+  window.addEventListener("DOMContentLoaded", function() {
+    var savedToken = sessionStorage.getItem("app_token");
+    var savedRole = sessionStorage.getItem("app_role");
+    if (savedToken && savedRole) {
+      initAppAfterLogin(savedRole);
+    } else {
+      document.getElementById("loginOverlay").style.display = "flex";
+      setTimeout(function() {
+        document.getElementById("loginPasswordInput").focus();
+      }, 100);
+    }
+  });
 </script>
 </body>
 </html>

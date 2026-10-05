@@ -634,7 +634,8 @@
 </div>
 
 <script>
-  var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxGdhjZl9VpBU1hSyUrwlmBt2utjBIa_aRCsHkYjDs0PIgKvCuXeUaA8vQeWsDC4PfV/exec"; 
+  // آدرس وب‌اپ گوگل اسکریپت
+  var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw-FzhBcOXSU_eikpJFW2BuEu7GusEvuweGLTbBvp-8LvisRLOd-09lGxaSmE8NYhYpUQ/exec"; 
 
   var allPeople = [];
   var selectedPeople = new Set();
@@ -675,6 +676,7 @@
     payload = payload || {};
     payload.action = action;
     payload.token = getApiToken();
+
     var targetUrl = SCRIPT_URL || window.location.href;
     var resp = await fetch(targetUrl, {
       method: "POST",
@@ -686,11 +688,11 @@
 
   // --- سیستم لاگین ---
   async function submitLogin() {
-    var token = document.getElementById("loginPasswordInput").value.trim();
+    var pass = document.getElementById("loginPasswordInput").value.trim();
     var btn = document.getElementById("loginBtn");
     var errEl = document.getElementById("loginErrorMsg");
 
-    if (!token) {
+    if (!pass) {
       errEl.textContent = "لطفاً رمز عبور را وارد نمایید.";
       errEl.style.display = "block";
       return;
@@ -704,12 +706,12 @@
       var resp = await fetch(SCRIPT_URL, {
         method: "POST",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({ action: "verifyLogin", token: token })
+        body: JSON.stringify({ action: "verifyLogin", token: pass })
       });
       var res = await resp.json();
 
       if (res.ok) {
-        sessionStorage.setItem("app_token", token);
+        sessionStorage.setItem("app_token", pass);
         sessionStorage.setItem("app_role", res.role);
         initAppAfterLogin(res.role);
       } else {
@@ -730,8 +732,8 @@
     document.getElementById("mainApp").style.display = "flex";
     document.getElementById("deputyRoleBadge").textContent = roleName;
     
-    loadPeople();
-    loadTags();
+    // اجرای همزمان برای بهینه‌سازی سرعت بارگذاری
+    Promise.all([loadPeople(), loadTags()]);
   }
 
   function logout() {
@@ -797,7 +799,7 @@
 
   function renderPeople(list) {
     var container = document.getElementById("peopleContainer");
-    if (!list.length) {
+    if (!list || !list.length) {
       container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 30px; color: var(--text-muted);">موردی یافت نشد.</div>';
       return;
     }
@@ -842,7 +844,7 @@
     var q = document.getElementById("searchBox").value.trim().toLowerCase();
     var gr = document.getElementById("gradeFilter").value;
     return allPeople.filter(function(p) {
-      var matchQ = !q || p.fullName.toLowerCase().includes(q) || (p.fileNo && p.fileNo.includes(q));
+      var matchQ = !q || (p.fullName && p.fullName.toLowerCase().includes(q)) || (p.fileNo && p.fileNo.includes(q));
       var matchGr = gr === "all" || p.grade === gr;
       return matchQ && matchGr;
     });
@@ -1426,7 +1428,7 @@
     }
   });
 
-  // بررسی وضعیت لاگین
+  // بررسی وضعیت لاگین هنگام لود
   window.addEventListener("DOMContentLoaded", function() {
     var savedToken = sessionStorage.getItem("app_token");
     var savedRole = sessionStorage.getItem("app_role");
